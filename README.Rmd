@@ -1,0 +1,10 @@
+---
+title: "README"
+output: html_document
+date: "2022-11-25"
+---
+
+# Purpose 
+
+This is the platform for my Financial Econometrics exam in 2022. 
+
