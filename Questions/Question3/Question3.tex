@@ -1,0 +1,319 @@
+\documentclass[11pt,preprint, authoryear]{elsarticle}
+
+\usepackage{lmodern}
+%%%% My spacing
+\usepackage{setspace}
+\setstretch{1.2}
+\DeclareMathSizes{12}{14}{10}{10}
+
+% Wrap around which gives all figures included the [H] command, or places it "here". This can be tedious to code in Rmarkdown.
+\usepackage{float}
+\let\origfigure\figure
+\let\endorigfigure\endfigure
+\renewenvironment{figure}[1][2] {
+    \expandafter\origfigure\expandafter[H]
+} {
+    \endorigfigure
+}
+
+\let\origtable\table
+\let\endorigtable\endtable
+\renewenvironment{table}[1][2] {
+    \expandafter\origtable\expandafter[H]
+} {
+    \endorigtable
+}
+
+
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+    \usepackage{xltxtra,xunicode}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+\fi
+
+\usepackage{amssymb, amsmath, amsthm, amsfonts}
+
+\def\bibsection{\section*{References}} %%% Make "References" appear before bibliography
+
+
+\usepackage[round]{natbib}
+
+\usepackage{longtable}
+\usepackage[margin=2.3cm,bottom=2cm,top=2.5cm, includefoot]{geometry}
+\usepackage{fancyhdr}
+\usepackage[bottom, hang, flushmargin]{footmisc}
+\usepackage{graphicx}
+\numberwithin{equation}{section}
+\numberwithin{figure}{section}
+\numberwithin{table}{section}
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{1.3ex plus 0.5ex minus 0.3ex}
+\usepackage{textcomp}
+\renewcommand{\headrulewidth}{0.2pt}
+\renewcommand{\footrulewidth}{0.3pt}
+
+\usepackage{array}
+\newcolumntype{x}[1]{>{\centering\arraybackslash\hspace{0pt}}p{#1}}
+
+%%%%  Remove the "preprint submitted to" part. Don't worry about this either, it just looks better without it:
+\makeatletter
+\def\ps@pprintTitle{%
+  \let\@oddhead\@empty
+  \let\@evenhead\@empty
+  \let\@oddfoot\@empty
+  \let\@evenfoot\@oddfoot
+}
+\makeatother
+
+ \def\tightlist{} % This allows for subbullets!
+
+\usepackage{hyperref}
+\hypersetup{breaklinks=true,
+            bookmarks=true,
+            colorlinks=true,
+            citecolor=blue,
+            urlcolor=blue,
+            linkcolor=blue,
+            pdfborder={0 0 0}}
+
+
+% The following packages allow huxtable to work:
+\usepackage{siunitx}
+\usepackage{multirow}
+\usepackage{hhline}
+\usepackage{calc}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{caption}
+
+
+\newenvironment{columns}[1][]{}{}
+
+\newenvironment{column}[1]{\begin{minipage}{#1}\ignorespaces}{%
+\end{minipage}
+\ifhmode\unskip\fi
+\aftergroup\useignorespacesandallpars}
+
+\def\useignorespacesandallpars#1\ignorespaces\fi{%
+#1\fi\ignorespacesandallpars}
+
+\makeatletter
+\def\ignorespacesandallpars{%
+  \@ifnextchar\par
+    {\expandafter\ignorespacesandallpars\@gobble}%
+    {}%
+}
+\makeatother
+
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newenvironment{CSLReferences}%
+  {\setlength{\parindent}{0pt}%
+  \everypar{\setlength{\hangindent}{\cslhangindent}}\ignorespaces}%
+  {\par}
+
+
+\urlstyle{same}  % don't use monospace font for urls
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\setcounter{secnumdepth}{5}
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+
+%%% Include extra packages specified by user
+
+%%% Hard setting column skips for reports - this ensures greater consistency and control over the length settings in the document.
+%% page layout
+%% paragraphs
+\setlength{\baselineskip}{12pt plus 0pt minus 0pt}
+\setlength{\parskip}{12pt plus 0pt minus 0pt}
+\setlength{\parindent}{0pt plus 0pt minus 0pt}
+%% floats
+\setlength{\floatsep}{12pt plus 0 pt minus 0pt}
+\setlength{\textfloatsep}{20pt plus 0pt minus 0pt}
+\setlength{\intextsep}{14pt plus 0pt minus 0pt}
+\setlength{\dbltextfloatsep}{20pt plus 0pt minus 0pt}
+\setlength{\dblfloatsep}{14pt plus 0pt minus 0pt}
+%% maths
+\setlength{\abovedisplayskip}{12pt plus 0pt minus 0pt}
+\setlength{\belowdisplayskip}{12pt plus 0pt minus 0pt}
+%% lists
+\setlength{\topsep}{10pt plus 0pt minus 0pt}
+\setlength{\partopsep}{3pt plus 0pt minus 0pt}
+\setlength{\itemsep}{5pt plus 0pt minus 0pt}
+\setlength{\labelsep}{8mm plus 0mm minus 0mm}
+\setlength{\parsep}{\the\parskip}
+\setlength{\listparindent}{\the\parindent}
+%% verbatim
+\setlength{\fboxsep}{5pt plus 0pt minus 0pt}
+
+
+
+\begin{document}
+
+
+
+\begin{frontmatter}  %
+
+\title{Question 3}
+
+% Set to FALSE if wanting to remove title (for submission)
+
+
+
+
+\author[Add1]{Joshua Strydom\footnote{\textbf{Contributions:}
+  \newline \emph{The authors would like to thank no institution for
+  money donated to this project. Thank you sincerely.}}}
+\ead{20718284@sun.ac.za}
+
+
+
+
+
+\address[Add1]{Stellenbosch University, Stellenbosch, South Africa}
+
+
+
+\vspace{1cm}
+
+
+
+
+
+\vspace{0.5cm}
+
+\end{frontmatter}
+
+
+
+%________________________
+% Header and Footers
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\chead{}
+\rhead{}
+\lfoot{}
+\rfoot{\footnotesize Page \thepage}
+\lhead{}
+%\rfoot{\footnotesize Page \thepage } % "e.g. Page 2"
+\cfoot{}
+
+%\setlength\headheight{30pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%________________________
+
+\headsep 35pt % So that header does not go over title
+
+
+
+
+\hypertarget{alsi-and-swix}{%
+\section{\texorpdfstring{ALSI and SWIX
+\label{ALSISWIX}}{ALSI and SWIX }}\label{alsi-and-swix}}
+
+\begin{figure}[H]
+
+{\centering \includegraphics{Question3_files/figure-latex/Figure1-1} 
+
+}
+
+\caption{Cumulative returns \label{Figure1}}\label{fig:Figure1}
+\end{figure}
+
+The ALSI and the SWIX have, over the past decade, followed each other
+closely in terms of cumulative returns. The SWIX seemed to have
+consistently outperformed the ALSI from approximately 2011 to 2020.
+Post-2020, the ALSI has outperformed the SWIX.
+
+\begin{figure}[H]
+
+{\centering \includegraphics{Question3_files/figure-latex/Figure2-1} 
+
+}
+
+\caption{Rolling returns \label{Figure2}}\label{fig:Figure2}
+\end{figure}
+
+Figures \ref{Figure2} displays the returns generated by the ALSI and
+SWIX over a 6 month, 1 year, 3 year and 5 year period. The only time
+that the SWIX outperformed the ALSI was over the 5 year period. The
+outperformance, however, was by a meagre 0.29\%. The longer an
+individual intends for their money to be in the market, the more
+attractive the SWIX becomes in a relative sense.
+
+\hypertarget{large-mid-and-small-cap-contributions-to-returns}{%
+\section{Large, Mid and Small cap contributions to
+returns}\label{large-mid-and-small-cap-contributions-to-returns}}
+
+\begin{figure}[H]
+
+{\centering \includegraphics{Question3_files/figure-latex/Figure3-1} 
+
+}
+
+\caption{Large caps \label{Figure3}}\label{fig:Figure3}
+\end{figure}
+
+Seeing as though the SWIX and ALSI are predominantly made up of large
+cap stocks, the choice of such stocks is very important. The
+contribution to cumulative returns by large cap stocks has been
+historically larger for the SWIX than for the ALSI. This is not,
+however, the case post-2020 as the cumulative returns for the ALSI are
+larger than that of the SWIX.
+
+\begin{figure}[H]
+
+{\centering \includegraphics{Question3_files/figure-latex/Figure4-1} 
+
+}
+
+\caption{Mid caps \label{Figure4}}\label{fig:Figure4}
+\end{figure}
+
+Mid cap cumulative returns for both indices have tracked each other
+reasonably well, with the ALSI generally just outperforming the SWIX.
+The actual contribution of these stocks to overall cumulative returns
+have not been that high though.
+
+\begin{figure}[H]
+
+{\centering \includegraphics{Question3_files/figure-latex/Figure5-1} 
+
+}
+
+\caption{Small caps \label{Figure5}}\label{fig:Figure5}
+\end{figure}
+
+The contribution of small cap stocks to cumulative returns is at best
+marginal. Small cap stocks within the SWIX seem to be `better' than
+those of the ALSI. The sample does not extend past 2018 though.
+
+\hypertarget{conclusion}{%
+\section{Conclusion}\label{conclusion}}
+
+The ALSI and SWIX have largely performed equally well. The performance
+of different size indexes, sector exposures and stock concentration over
+time are very important.
+
+\bibliography{Tex/ref}
+
+
+
+
+
+\end{document}

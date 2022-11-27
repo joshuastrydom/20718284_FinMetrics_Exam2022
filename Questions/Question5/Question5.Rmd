@@ -1,0 +1,290 @@
+---
+# IMPORTANT: Change settings here, but DO NOT change the spacing.
+# Remove comments and add values where applicable.
+# The descriptions below should be self-explanatory
+
+title: "Question 5"
+#subtitle: "This will appear as Right Header"
+
+documentclass: "elsarticle"
+
+# --------- Thesis title (Optional - set to FALSE by default).
+# You can move the details below around as you please.
+Thesis_FP: FALSE
+# Entry1: "An unbelievable study with a title spanning multiple lines."
+# Entry2: "\\textbf{Nico Katzke}" # textbf for bold
+# Entry3: "A thesis submitted toward the degree of Doctor of Philosophy"
+# Uni_Logo: Tex/Logo.png # Place a logo in the indicated location (from your root, e.g. defaults to ~/Tex/Logo.png) and uncomment this line. Leave uncommented for no image
+# Logo_width: 0.3 # If using a logo - use this to set width (size) of image
+# Entry4: "Under the supervision of: \\vfill Prof. Joe Smith and Dr. Frank Smith"
+# Entry5: "Stellenbosch University"
+# Entry6: April 2020
+# Entry7:
+# Entry8:
+
+# --------- Front Page
+# Comment: ----- Follow this pattern for up to 5 authors
+AddTitle: TRUE # Use FALSE when submitting to peer reviewed platform. This will remove author names.
+Author1: "Joshua Strydom^[__Contributions:__  \\newline _The authors would like to thank no institution for money donated to this project. Thank you sincerely._]"  # First Author - note the thanks message displayed as an italic footnote of first page.
+Ref1: "Stellenbosch University, Stellenbosch, South Africa" # First Author's Affiliation
+Email1: "20718284\\@sun.ac.za" # First Author's Email address
+
+#Author2: "John Smith"
+#Ref2: "Some other Institution, Cape Town, South Africa"
+#Email2: "John\\@gmail.com"
+#CommonAffiliation_12: TRUE # If Author 1 and 2 have a common affiliation. Works with _13, _23, etc.
+
+#Author3: "John Doe"
+#Email3: "Joe\\@gmail.com"
+
+#CorrespAuthor_1: TRUE  # If corresponding author is author 3, e.g., use CorrespAuthor_3: TRUE
+
+# Comment out below to remove both. JEL Codes only given if keywords also given.
+#keywords: "Multivariate GARCH \\sep Kalman Filter \\sep Copula" # Use \\sep to separate
+#JELCodes: "L250 \\sep L100"
+
+# ----- Manage headers and footers:
+#BottomLFooter: $Title$
+#BottomCFooter:
+#TopLHeader: \leftmark # Adds section name at topleft. Remove comment to add it.
+BottomRFooter: "\\footnotesize Page \\thepage" # Add a '#' before this line to remove footer.
+addtoprule: TRUE
+addfootrule: TRUE               # Use if footers added. Add '#' to remove line.
+
+# --------- page margins:
+margin: 2.3 # Sides
+bottom: 2 # bottom
+top: 2.5 # Top
+HardSet_layout: TRUE # Hard-set the spacing of words in your document. This will stop LaTeX squashing text to fit on pages, e.g.
+# This is done by hard-setting the spacing dimensions. Set to FALSE if you want LaTeX to optimize this for your paper.
+
+# --------- Line numbers
+linenumbers: FALSE # Used when submitting to journal
+
+# ---------- References settings:
+# You can download cls format here: https://www.zotero.org/ - simply search for your institution. You can also edit and save cls formats here: https://editor.citationstyles.org/about/
+# Hit download, store it in Tex/ folder, and change reference below - easy.
+bibliography: Tex/ref.bib       # Do not edit: Keep this naming convention and location.
+csl: Tex/harvard-stellenbosch-university.csl # referencing format used.
+# By default, the bibliography only displays the cited references. If you want to change this, you can comment out one of the following:
+#nocite: '@*' # Add all items in bibliography, whether cited or not
+# nocite: |  # add specific references that aren't cited
+#  @grinold2000
+#  @Someoneelse2010
+
+# ---------- General:
+RemovePreprintSubmittedTo: TRUE  # Removes the 'preprint submitted to...' at bottom of titlepage
+Journal: "Journal of Finance"   # Journal that the paper will be submitting to, if RemovePreprintSubmittedTo is set to TRUE.
+toc: FALSE                       # Add a table of contents
+numbersections: TRUE             # Should sections (and thus figures and tables) be numbered?
+fontsize: 11pt                  # Set fontsize
+linestretch: 1.2                # Set distance between lines.
+link-citations: TRUE            # This creates dynamic links to the papers in reference list.
+
+### Adding additional latex packages:
+# header-includes:
+#    - \usepackage{colortbl} # Add additional packages here.
+
+output:
+  pdf_document:
+    keep_tex: TRUE
+    template: Tex/TexDefault.txt
+    fig_width: 3.5 # Adjust default figure sizes. This can also be done in the chunks of the text.
+    fig_height: 3.5
+#abstract: |
+#  Abstract to be written here. The abstract should not be too long and should provide the reader with a good understanding what you are writing about. Academic papers are not like novels where you keep the reader in suspense. To be effective in getting others to read your paper, be as open and concise about your findings here as possible. Ideally, upon reading your abstract, the reader should feel he / she must read your paper in entirety.
+---
+
+<!-- First: Set your default preferences for chunk options: -->
+
+<!-- If you want a chunk's code to be printed, set echo = TRUE. message = FALSE stops R printing ugly package loading details in your final paper too. I also suggest setting warning = FALSE and checking for warnings in R, else you might find ugly warnings in your paper. -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5, fig.pos="H", fig.pos = 'H')
+if(!require("tidyverse")) install.packages("tidyverse")
+library(tidyverse)
+pacman::p_load(PerformanceAnalytics)
+pacman::p_load(RcppRoll)
+pacman::p_load("tidyr", "tbl2xts","devtools","lubridate", "readr", "PerformanceAnalytics", "ggplot2", "dplyr", "rmsfuns", "tibble", "knitr", "lubridate", "pacman", "PortRisk", "psych", "quadprog", "RcppRoll", "rmarkdown", "rmgarch", "rportfolio", "tbl2xts", "Texevier", "tidyfit", "tidyverse", "broom", "xts", "zoo", "factoextra", "FactoMineR", "fEcofin", "fmxdat", "glue", "huxtable")
+cncy <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/currencies.rds")
+cncy_Carry <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/cncy_Carry.rds") 
+cncy_value <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/cncy_value.rds") 
+cncyIV <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/cncyIV.rds")
+bbdxy <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/bbdxy.rds")
+```
+
+```{r data, include=FALSE}
+vol_currency <- cncy |> 
+    #gather(Name, Price, -date) |> 
+    #group_by(Name) |>
+    mutate(return = Price/lag(Price) - 1) |> 
+    mutate(dlogret = log(Price) - log(lag(Price))) |>
+    mutate(scaledret = (dlogret - mean(dlogret, na.rm = T))) |> 
+    filter(date > dplyr::first(date)) |> 
+    ungroup() |> 
+    mutate(Name = gsub("\\_Cncy", "", Name))
+Tidyrtn <- vol_currency
+vol_curr.xts <- vol_currency |> 
+    filter(Name %in% c("SouthAfrica", "EU_Inv", "Brazil", "UK_Inv", "China", "Japan", "Canada", "India")) |> 
+    tbl_xts(cols_to_xts = "dlogret", spread_by = "Name") |> 
+    na.omit()
+volmeasure <- Tidyrtn |> 
+    mutate(SampleSD = sqrt(return^2)) |> 
+    select(-Price, -return, -dlogret, -scaledret)
+volmeasureSA <- Tidyrtn |> 
+    filter(Name %in% "SouthAfrica") |> 
+    select(-Name, -Price, -dlogret, -scaledret) |> 
+    mutate(SampleSD = sqrt(return^2))
+volmeasureBRICS <- Tidyrtn |> 
+    mutate(SampleSD = sqrt(return^2)) |> 
+    select(-Price, -return, -dlogret, -scaledret) |> 
+    filter(Name %in% c("SouthAfrica", "Russia", "China", "India"))
+    #filter(!Name %in% c("Argentina", "Australia_Inv", "Bostwana_Inv", "China"))
+volmeasureG10 <- Tidyrtn |> 
+    mutate(SampleSD = sqrt(return^2)) |> 
+    select(-Price, -return, -dlogret, -scaledret) |> 
+    filter(Name %in% c("SouthAfrica", "US", "UK_Inv", "Sweden", "Switzerland", "Netherlands", "Japan", "Italy", "Germany", "France", "Canada", "Belgium"))
+back = 100
+
+DBHVG10U <- cncy_Carry |> 
+    group_by(Name) |> 
+    mutate(return = Price/lag(Price) - 1) |> 
+    mutate(dlogret = log(Price) - log(lag(Price))) |> 
+    mutate(scaledret = (dlogret - mean(dlogret, na.rm = T))) |> 
+    filter(date > dplyr::first(date)) |> 
+    ungroup() |> 
+    tbl_xts(cols_to_xts = "return", spread_by = "Name")
+TidySA <- Tidyrtn |> 
+    filter(Name %in% "SouthAfrica") |> 
+    tbl_xts(cols_to_xts = "return", spread_by = "Name")
+carry_SA <- merge.xts(TidySA, DBHVG10U, all = TRUE) |> 
+    xts_tbl() |> 
+    gather(Name, Return, -date)
+
+ImpliedVol <- cncyIV |> 
+    group_by(Name) |> 
+    mutate(ret = Price/lag(Price) - 1) |> 
+    mutate(dlogret = log(Price) - log(lag(Price))) |> 
+    mutate(scaledret = (dlogret - mean(dlogret, na.rm = T))) |> 
+    filter(date > dplyr::first(date)) |> 
+    ungroup() |> 
+    mutate(Name = gsub("\\_IV", "", Name)) |> 
+    filter(Name %in% c("Australia", "Brazil", "China", "EU", "India", "Japan", "Russia", "SouthAfrica", "UK"))
+G10IV <- ImpliedVol |> 
+    filter(Name %in% c("Canada", "Japan", "Sweden", "UK", "SouthAfrica"))
+```
+
+
+<!-- ############################## -->
+<!-- # Start Writing here: -->
+<!-- ############################## -->
+
+# Introduction \label{Introduction}
+
+```{r Figure1,  warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure1}", fig.ext = 'png', fig.height = 5, fig.width = 7}
+ggplot(Tidyrtn) + 
+    geom_line(aes(x = date, y = Price, colour = Name, 
+    alpha = 0.5)) + 
+    ggtitle("Price Changes: Currencies") + 
+    facet_wrap(~Name, scales = "free_y") + 
+    guides(alpha = "none") + 
+    scale_color_hue(l = 20) + 
+    scale_x_date(labels = scales::date_format("'%y"), date_breaks = "2 years") + 
+    theme(axis.text = element_text(size = 7), legend.position = "none")
+```
+
+Figure \ref{Figure1} displays the price changes for the various currencies. South Africa, although not the most volatile, is relatively volatile to many currencies. 
+
+```{r Figure2, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure2}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+volmeasureBRICS |> 
+    ggplot() +
+    geom_line(aes(date, SampleSD, color = Name)) +
+    ggtitle("SD for simple returns of BRICS currencies")
+```
+
+Figure \ref{Figure2} plots the standard deviation of simple returns and clearly shows that South Africa is not the most volatile currency in the BRICS. 
+
+```{r Figure3, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure3}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+volmeasureG10 |> 
+    ggplot() +
+    geom_line(aes(date, SampleSD, color = Name)) +
+    ggtitle("SD for simple returns of G10 (&SA) currencies")
+```
+
+Figure \ref{Figure3}, however, shows South Africa to be the more volatile currency when compared to G10 member countries in the sample. 
+
+# Simple rolling standard deviation calculation for South Africa's currency volatility
+
+```{r Figure4, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure4}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+volmeasureSA %>% 
+    mutate(Constant_var = sd(return)) %>% 
+    mutate(Roller = roll_sd(return, n = back, fill = NA)) %>% 
+    ggplot() + 
+    geom_line(aes(date, SampleSD), color = "steelblue") + 
+    geom_hline(aes(date, yintercept = mean(Constant_var)), color = "red", 
+    alpha = 0.8, size = 2) + 
+    geom_line(aes(date, y = Roller), color = "darkgreen", alpha = 0.8, 
+    size = 2) + 
+    labs(title = "Sample Var vs Constant Var")
+```
+
+
+# Currency carry trades \label{carry}
+
+```{r Figure5, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure5}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+ggplot(carry_SA) +
+    geom_line(aes(x = date, y = Return, colour = Name, alpha = 0.5)) + 
+    ggtitle("Returns") + 
+    guides(alpha = "none")
+```
+
+Figure \ref{Figure5} shows the simple return of both the South African currency and the carry currency. It can be noted that the Rand follows the currency carry and has performed well during periods where G10 currency carry trades have been favourable. Globally, it has been one of the currencies that most benefit during periods where the Dollar is comparatively strong. 
+
+# Implied volatility \label{IV}
+
+```{r Figure6, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure6}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+ggplot(ImpliedVol) + 
+    geom_line(aes(x = date, y = dlogret, colour = Name, 
+    alpha = 0.5)) + 
+ggtitle("Log of returns: Implied volatility") + 
+facet_wrap(~Name, scales = "free_y") + 
+guides(alpha = "none") + 
+#fmxdat::theme_fmx() + 
+scale_color_hue(l = 20) + 
+scale_x_date(labels = scales::date_format("'%y"), date_breaks = "2 years") + 
+    
+theme(axis.text = element_text(size = 7))
+```
+
+Figure \ref{Figure6} shows the log returns of implied volatility. The most volatile of the group are that of Brazil, China, India and South Africa. 
+
+```{r Figure7, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure7}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+ggplot(ImpliedVol) + 
+    geom_line(aes(x = date, y = Price, colour = Name, alpha = 0.5)) + 
+    ggtitle("Price Changes: ImpliedVol") + 
+    guides(alpha = "none")
+```
+
+Figure \ref{Figure7} again shows South Africa to have a high relative implied volatility. 
+
+```{r Figure8, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure8}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+ggplot(G10IV) + 
+    geom_line(aes(x = date, y = dlogret, colour = Name, 
+    alpha = 0.5)) + 
+ggtitle("Log of returns: Implied volatility for G10 and SA") + 
+facet_wrap(~Name, scales = "free_y") + 
+guides(alpha = "none") + 
+#fmxdat::theme_fmx() + 
+scale_color_hue(l = 20) + 
+scale_x_date(labels = scales::date_format("'%y"), date_breaks = "2 years") + 
+    
+theme(axis.text = element_text(size = 7))
+```
+
+Figure \ref{Figure8} shows South Africa to have the highest implied volatility relative to the G10 member states in the data provided.  
+
+# Conclusion \label{Concl}
+
+The South African rand (ZAR) has over the past few years been one of the most volatile currencies. 
+
+

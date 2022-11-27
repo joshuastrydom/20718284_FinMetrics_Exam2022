@@ -1,0 +1,370 @@
+---
+# IMPORTANT: Change settings here, but DO NOT change the spacing.
+# Remove comments and add values where applicable.
+# The descriptions below should be self-explanatory
+
+title: "Question 2"
+#subtitle: "This will appear as Right Header"
+
+documentclass: "elsarticle"
+
+# --------- Thesis title (Optional - set to FALSE by default).
+# You can move the details below around as you please.
+Thesis_FP: FALSE
+# Entry1: "An unbelievable study with a title spanning multiple lines."
+# Entry2: "\\textbf{Nico Katzke}" # textbf for bold
+# Entry3: "A thesis submitted toward the degree of Doctor of Philosophy"
+# Uni_Logo: Tex/Logo.png # Place a logo in the indicated location (from your root, e.g. defaults to ~/Tex/Logo.png) and uncomment this line. Leave uncommented for no image
+# Logo_width: 0.3 # If using a logo - use this to set width (size) of image
+# Entry4: "Under the supervision of: \\vfill Prof. Joe Smith and Dr. Frank Smith"
+# Entry5: "Stellenbosch University"
+# Entry6: April 2020
+# Entry7:
+# Entry8:
+
+# --------- Front Page
+# Comment: ----- Follow this pattern for up to 5 authors
+AddTitle: TRUE # Use FALSE when submitting to peer reviewed platform. This will remove author names.
+Author1: "Joshua Strydom^[__Contributions:__  \\newline _The authors would like to thank no institution for money donated to this project. Thank you sincerely._]"  # First Author - note the thanks message displayed as an italic footnote of first page.
+Ref1: "Stellenbosch University, Stellenbosch, South Africa" # First Author's Affiliation
+Email1: "20718284\\@sun.ac.za" # First Author's Email address
+
+#Author2: "John Smith"
+#Ref2: "Some other Institution, Cape Town, South Africa"
+#Email2: "John\\@gmail.com"
+#CommonAffiliation_12: TRUE # If Author 1 and 2 have a common affiliation. Works with _13, _23, etc.
+
+#Author3: "John Doe"
+#Email3: "Joe\\@gmail.com"
+
+#CorrespAuthor_1: TRUE  # If corresponding author is author 3, e.g., use CorrespAuthor_3: TRUE
+
+# Comment out below to remove both. JEL Codes only given if keywords also given.
+#keywords: "Multivariate GARCH \\sep Kalman Filter \\sep Copula" # Use \\sep to separate
+#JELCodes: "L250 \\sep L100"
+
+# ----- Manage headers and footers:
+#BottomLFooter: $Title$
+#BottomCFooter:
+#TopLHeader: \leftmark # Adds section name at topleft. Remove comment to add it.
+BottomRFooter: "\\footnotesize Page \\thepage" # Add a '#' before this line to remove footer.
+addtoprule: TRUE
+addfootrule: TRUE               # Use if footers added. Add '#' to remove line.
+
+# --------- page margins:
+margin: 2.3 # Sides
+bottom: 2 # bottom
+top: 2.5 # Top
+HardSet_layout: TRUE # Hard-set the spacing of words in your document. This will stop LaTeX squashing text to fit on pages, e.g.
+# This is done by hard-setting the spacing dimensions. Set to FALSE if you want LaTeX to optimize this for your paper.
+
+# --------- Line numbers
+linenumbers: FALSE # Used when submitting to journal
+
+# ---------- References settings:
+# You can download cls format here: https://www.zotero.org/ - simply search for your institution. You can also edit and save cls formats here: https://editor.citationstyles.org/about/
+# Hit download, store it in Tex/ folder, and change reference below - easy.
+bibliography: Tex/ref.bib       # Do not edit: Keep this naming convention and location.
+csl: Tex/harvard-stellenbosch-university.csl # referencing format used.
+# By default, the bibliography only displays the cited references. If you want to change this, you can comment out one of the following:
+#nocite: '@*' # Add all items in bibliography, whether cited or not
+# nocite: |  # add specific references that aren't cited
+#  @grinold2000
+#  @Someoneelse2010
+
+# ---------- General:
+RemovePreprintSubmittedTo: TRUE  # Removes the 'preprint submitted to...' at bottom of titlepage
+Journal: "Journal of Finance"   # Journal that the paper will be submitting to, if RemovePreprintSubmittedTo is set to TRUE.
+toc: FALSE                       # Add a table of contents
+numbersections: TRUE             # Should sections (and thus figures and tables) be numbered?
+fontsize: 11pt                  # Set fontsize
+linestretch: 1.2                # Set distance between lines.
+link-citations: TRUE            # This creates dynamic links to the papers in reference list.
+
+### Adding additional latex packages:
+# header-includes:
+#    - \usepackage{colortbl} # Add additional packages here.
+
+output:
+  pdf_document:
+    keep_tex: TRUE
+    template: Tex/TexDefault.txt
+    fig_width: 3.5 # Adjust default figure sizes. This can also be done in the chunks of the text.
+    fig_height: 3.5
+#abstract: |
+#  Abstract to be written here. The abstract should not be too long and should provide the reader with a good understanding what you are writing about. Academic papers are not like novels where you keep the reader in suspense. To be effective in getting others to read your paper, be as open and concise about your findings here as possible. Ideally, upon reading your abstract, the reader should feel he / she must read your paper in entirety.
+---
+
+<!-- First: Set your default preferences for chunk options: -->
+
+<!-- If you want a chunk's code to be printed, set echo = TRUE. message = FALSE stops R printing ugly package loading details in your final paper too. I also suggest setting warning = FALSE and checking for warnings in R, else you might find ugly warnings in your paper. -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5, fig.pos="H", fig.pos = 'H')
+pacman::p_load("tidyr", "tbl2xts","devtools","lubridate", "readr", "PerformanceAnalytics", "ggplot2", "dplyr", "rmsfuns", "tibble", "knitr", "lubridate", "pacman", "PortRisk", "psych", "quadprog", "RcppRoll", "rmarkdown", "rmgarch", "rportfolio", "tbl2xts", "Texevier", "tidyfit", "tidyverse", "broom", "xts", "zoo", "factoextra", "FactoMineR", "fEcofin", "fmxdat", "glue", "huxtable")
+
+SA_Bonds <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/SA_Bonds.rds") 
+BE_Infl <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/BE_Infl.rds") 
+bonds_2y <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/bonds_2y.rds") 
+bonds_10y <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/bonds_10y.rds") 
+usdzar <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/usdzar.rds")
+ZA_Infl <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/ZA_Infl.rds")
+IV <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/IV.rds")
+
+SA_Bondspread.xts <- SA_Bonds |>
+    mutate(M3v2Y = ZA_2Yr - SA_3M) |> 
+    mutate(M3v10Y = ZA_10Yr - SA_3M) |> 
+    mutate(Y2v10Y = ZA_10Yr - ZA_2Yr) |> 
+    select(date, M3v2Y, M3v10Y, Y2v10Y) |> 
+    tbl_xts()
+
+SA_bondspreadlong <- SA_Bondspread.xts |> 
+    xts_tbl() |> 
+    gather(key = "Spread", value = "value", -date)
+
+ThreeM2Yspread <- SA_bondspreadlong |> 
+    filter(Spread %in% "M3v2Y")
+TwoY10Yspread <- SA_bondspreadlong |> 
+    filter(Spread %in% "Y2v10Y")
+ThreeM10Yspread <- SA_bondspreadlong |> 
+    filter(Spread %in% "M3v10Y")
+
+Brazil_2Yr <- bonds_2y |> 
+    filter(Name %in% "Brazil_2yr") |> 
+    filter(date > "2011-10-03") |> 
+    rename(Brazil_2Yr = Bond_2Yr) |> 
+    tbl_xts()
+India_2Yr <- bonds_2y |> 
+    filter(Name %in% "India_2yr") |> 
+    filter(date > "2011-10-03") |> 
+    rename(India_2Yr = Bond_2Yr) |> 
+    tbl_xts()
+Russia_2Yr <- bonds_2y |> 
+    filter(Name %in% "Russia_2yr") |> 
+    filter(date > "2011-10-03") |> 
+    rename(Russia_2Yr = Bond_2Yr) |> 
+    tbl_xts()
+China_2Yr <- bonds_2y |> 
+    filter(Name %in% "CHINA_2yr") |> 
+    filter(date > "2011-10-03") |> 
+    rename(China_2Yr = Bond_2Yr) |> 
+    tbl_xts()
+Euro_2Yr <- bonds_2y |> 
+    filter(Name %in% "EURO_2yr") |> 
+    filter(date > "2011-10-03") |> 
+    rename(Euro_2Yr = Bond_2Yr) |> 
+    tbl_xts()
+Nigeria_2Yr <- bonds_2y |> 
+    filter(Name %in% "Nigeria_2yr") |> 
+    filter(date > "2011-10-03") |> 
+    rename(Nigeria_2Yr = Bond_2Yr) |> 
+    tbl_xts()
+SA_2Yr <- SA_Bonds |> 
+    select(date, ZA_2Yr) |> 
+    filter(date > "2011-10-03") |> 
+    tbl_xts()
+US_2Yr <- bonds_2y |> 
+    filter(Name %in% "US_2yr") |> 
+    filter(date > "2011-10-03") |> 
+    rename(US_2Yr = Bond_2Yr) |> 
+    tbl_xts()
+Joined_2Yr <- merge.xts(SA_2Yr, Nigeria_2Yr, Brazil_2Yr, India_2Yr, Russia_2Yr, China_2Yr, Euro_2Yr, US_2Yr, all = TRUE)
+Joined_2Yr.tbl <- Joined_2Yr |> 
+    xts_tbl() |> 
+    gather(key = "Bonds", value = "value", -date)
+
+Brazil_10Yr <- bonds_10y |> 
+    filter(Name %in% "Brazil_10Yr") |> 
+    filter(date > "2011-10-06") |> 
+    rename(Brazil_10Yr = Bond_10Yr) |> 
+    tbl_xts()
+India_10Yr <- bonds_10y |> 
+    filter(Name %in% "India_10Yr") |> 
+    filter(date > "2011-10-06") |> 
+    rename(India_10Yr = Bond_10Yr) |> 
+    tbl_xts()
+Russia_10Yr <- bonds_10y |> 
+    filter(Name %in% "Russia_10Yr") |> 
+    filter(date > "2011-10-06") |> 
+    rename(Russia_10Yr = Bond_10Yr) |> 
+    tbl_xts()
+China_10Yr <- bonds_10y |> 
+    filter(Name %in% "CHINA_10Yr") |> 
+    filter(date > "2011-10-06") |> 
+    rename(China_10Yr = Bond_10Yr) |> 
+    tbl_xts()
+Euro_10Yr <- bonds_10y |> 
+    filter(Name %in% "EURO_10Yr") |> 
+    filter(date > "2011-10-06") |> 
+    rename(Euro_10Yr = Bond_10Yr) |> 
+    tbl_xts()
+Nigeria_10Yr <- bonds_10y |> 
+    filter(Name %in% "Nigeria_10Yr") |> 
+    filter(date > "2011-10-06") |> 
+    rename(Nigeria_10Yr = Bond_10Yr) |> 
+    tbl_xts()
+SA_10Yr <- SA_Bonds |> 
+    select(date, ZA_10Yr) |> 
+    filter(date > "2011-10-06") |> 
+    tbl_xts()
+US_10Yr <- bonds_10y |> 
+    filter(Name %in% "US_10Yr") |> 
+    filter(date > "2011-10-06") |> 
+    rename(US_10Yr = Bond_10Yr) |> 
+    tbl_xts()
+Joined_10Yr <- merge.xts(SA_10Yr, Nigeria_10Yr, Brazil_10Yr, India_10Yr, Russia_10Yr, China_10Yr, Euro_10Yr, US_10Yr, all = TRUE)
+Joined_10Yr.tbl <- Joined_10Yr |> 
+    xts_tbl() |> 
+    gather(key = "Bonds", value = "value", -date)
+
+usdzar.xts <- usdzar |> 
+    rename(USDZAR = Price) |> 
+    mutate(ExchangeRateChange = USDZAR/lag(USDZAR)-1) |> 
+    filter(date > dplyr::first(date)) |> 
+    tbl_xts()
+BE_infl.xts <- BE_Infl |> 
+    rename(BEinflation = Price) |> 
+    mutate(BEInflationChange = BEinflation/lag(BEinflation)-1) |> 
+    filter(date > dplyr::first(date)) |> 
+    tbl_xts()
+ZA_infl.xts <- ZA_Infl |> 
+    rename(ZARinfl = Price) |> 
+    mutate(ZAInflationChange = ZARinfl/lag(ZARinfl)-1) |> 
+    filter(date > dplyr::first(date)) |> 
+    tbl_xts()
+usdzar_BEinfl_ZAinfl <- merge.xts(usdzar.xts, BE_infl.xts, ZA_infl.xts, all = TRUE) |> 
+    na.omit()
+usdzar_BEinfl_ZAinfl_level <- usdzar_BEinfl_ZAinfl |> 
+    xts_tbl() |> 
+    select(date, USDZAR, BEinflation, ZARinfl) |> 
+    gather(key = "Variables", value = "value", -date)
+usdzar_BEinfl_change <- usdzar_BEinfl_ZAinfl |> 
+    xts_tbl() |> 
+    select(date, ExchangeRateChange, BEInflationChange) |> 
+    gather(key = "Variables", value = "value", -date)
+ZARinfl_change <- usdzar_BEinfl_ZAinfl |> 
+    xts_tbl() |> 
+    select(date, ZAInflationChange) |> 
+    gather(key = "Variables", value = "value", -date)
+
+IV.tbl <- IV |> 
+    spread(Name, Price) |> 
+    gather(key = "Variable", value = "value", -date)
+```
+
+
+<!-- ############################## -->
+<!-- # Start Writing here: -->
+<!-- ############################## -->
+
+
+
+# Yield spreads \label{Yield}
+
+```{r Figure1,  warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure1}", fig.ext = 'png', fig.height = 3, fig.width = 6}
+
+ggplot(ThreeM2Yspread) +
+    geom_line(aes(date, value, color = Spread)) +
+    labs(title = "Illustration of 3 month and 2 year bond spreads", 
+    subtitle = "", x = "", y = "Date", 
+    caption = "Note:\nSpreads are calculated as the difference in the yield on two different bonds.")
+```
+
+The bond spread has over time increased but it is by no means high compared to historical spreads. 
+
+```{r Figure2, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure2}", fig.height = 3, fig.width = 6, dev = 'png'}
+
+ggplot(TwoY10Yspread) +
+    geom_line(aes(date, value, color = Spread)) +
+    labs(title = "Illustration of 2 year and 10 year bond spreads", 
+    subtitle = "", x = "", y = "Date", 
+    caption = "Note:\nSpreads are calculated as the difference in the yield on two different bonds.")
+```
+
+The bond spread has, over time, gradually increased. The yield spread between the 2 year and 10 year bonds have, since 2020, been the highest in decades. 
+
+```{r Figure3, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure3}", fig.height = 3, fig.width = 6, dev = 'png'}
+
+ggplot(ThreeM10Yspread) +
+    geom_line(aes(date, value, color = Spread)) +
+    labs(title = "Illustration of 3 month and 10 year bond spreads", 
+    subtitle = "", x = "", y = "Date", 
+    caption = "Note:\nSpreads are calculated as the difference in the yield on two different bonds.")
+```
+
+The bond spread has, over time, gradually increased. The yield spread between the 3 month and 10 year bonds have, since 2020, been the highest in decades. 
+
+<!-- The following is a code chunk. It must have its own unique name (after the r), or no name. After the comma follows commands for R which are self-explanatory. By default, the code and messages will not be printed in your pdf, just the output: -->
+
+```{r Figure4,  warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure4}", fig.ext = 'png', fig.height = 3, fig.width = 6}
+
+ggplot(SA_bondspreadlong) +
+    geom_line(aes(date, value, color = Spread)) +
+    labs(title = "Illustration of bond spreads", 
+    subtitle = "", x = "", y = "Date", 
+    caption = "Note:\nSpreads are calculated as the difference in the yield on two different bonds.")
+
+```
+
+One can clearly see, from Figure \ref{Figure4}, that all of the yield spreads become far larger from 2020 from an historical context. The spread between the 3 month and 10 year bonds as well as the spread between the 2 year and 10 year bonds are greatest during this respective period. The spreads seemed to have followed each others movements closely for the whole period. 
+
+# Comparing yields of international counterparts \label{International}
+
+```{r Figure5, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure5}", fig.height = 3, fig.width = 6, dev = 'png'}
+
+ggplot(Joined_2Yr.tbl) +
+    geom_line(aes(date, value, color = Bonds)) +
+    labs(title = "Illustration of 2 year bond yields", 
+    subtitle = "", x = "Date", y = "Yield")
+
+```
+
+The Nigerian 2 year bond yield appears to be highest with Russia's being second largest. The South African 2 year bond yield ranks third highest out of the group. The Euro 2 year bond yield has been consistently negative from about 2015. If market participants believe that there is higher inflation on the horizon, interest rates and bond yields will rise (and prices will decrease) to compensate for the loss of the purchasing power of future cash flows. Bonds with the longest cash flows will see their yields rise and prices fall the most.
+
+```{r Figure6, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure6}", fig.height = 3, fig.width = 6, dev = 'png'}
+
+ggplot(Joined_10Yr.tbl) +
+    geom_line(aes(date, value, color = Bonds)) +
+    labs(title = "Illustration of 10 year bond yields", 
+    subtitle = "", x = "Date", y = "Yield")
+```
+
+The Nigerian 10 year bond yield again appears to be highest while the South African 10 year yield ranks second this time from 2019 onwards. The Russian 10 year bond yield ranks approximately third highest out of the group although dipping below the Indian 10 year bond yield for a short period (between 2020 and 2021). The Euro 10 year bond yield has been consistently the lowest for the entire sample period and turned negative in the 2019 year. 
+
+# Background information \label{Background}
+
+```{r Figure7, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure7}", fig.height = 3, fig.width = 6, dev = 'png'}
+
+ggplot(usdzar_BEinfl_ZAinfl_level) +
+    geom_line(aes(date, value, color = Variables)) +
+    labs(title = "Illustration of level exchange rate and inflation", 
+    subtitle = "", x = "Date", y = "")
+```
+
+Actual inflation in South Africa has remained consistently below breakeven inflation since 2015. The Rand, as can be seen in the large spike post-2020, weakened against the Dollar. It has since gradually strengthened but is still high when compared to 10 years ago in 2012. 
+The increase in South African inflation could explain the fact that bond yields have increased recently. Bonds yields would've risen primarily because of a hawkish position of the SARB. Investors thus anticipate aggressive interest rate hikes to rein in inflation. 
+
+```{r Figure8, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure8}", fig.height = 3, fig.width = 6, dev = 'png'}
+ggplot(ZARinfl_change) +
+    geom_line(aes(date, value, color = Variables)) +
+    labs(title = "Illustration of change in ZAR inflation", 
+    subtitle = "", x = "Date", y = "")
+```
+
+The graph above depicts the change (calculated the same as a simple return) of the South African inflation rate. It is easy to tell that the inflation rate has proven to be more volatile post-2020 than has been the case historically. 
+
+```{r Figure9, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure9}", fig.height = 3, fig.width = 6, dev = 'png'}
+ggplot(IV.tbl) +
+    geom_line(aes(date, value, color = Variable)) +
+    labs(title = "Illustration of inflation volatility", 
+    subtitle = "", x = "Date", y = "")
+```
+
+Figure \ref{Figure9} reinterates the point made about Figure \ref{Figure8}. The largest spike in inflation volatility occurred in 2009 but this is to be expected. Inflation volatility had since declined but spiked again in 2020. Increased inflation and the volatility thereof generally leads to an increase in longer dated bond yields. This would explain the increase in longer dated bond spreads. 
+
+# Conclusion
+
+Yield spread in local mid to longer dated bond yields have since 2020 been the highest in decades. 
+
+
+

@@ -47,3 +47,11 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Never commit data files to GitHub
+data/
+**/data
+*/data/
+/data
+*/data
+data*

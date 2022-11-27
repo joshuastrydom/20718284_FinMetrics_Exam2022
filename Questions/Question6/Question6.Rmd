@@ -1,0 +1,279 @@
+---
+# IMPORTANT: Change settings here, but DO NOT change the spacing.
+# Remove comments and add values where applicable.
+# The descriptions below should be self-explanatory
+
+title: "Question 6"
+#subtitle: "This will appear as Right Header"
+
+documentclass: "elsarticle"
+
+# --------- Thesis title (Optional - set to FALSE by default).
+# You can move the details below around as you please.
+Thesis_FP: FALSE
+# Entry1: "An unbelievable study with a title spanning multiple lines."
+# Entry2: "\\textbf{Nico Katzke}" # textbf for bold
+# Entry3: "A thesis submitted toward the degree of Doctor of Philosophy"
+# Uni_Logo: Tex/Logo.png # Place a logo in the indicated location (from your root, e.g. defaults to ~/Tex/Logo.png) and uncomment this line. Leave uncommented for no image
+# Logo_width: 0.3 # If using a logo - use this to set width (size) of image
+# Entry4: "Under the supervision of: \\vfill Prof. Joe Smith and Dr. Frank Smith"
+# Entry5: "Stellenbosch University"
+# Entry6: April 2020
+# Entry7:
+# Entry8:
+
+# --------- Front Page
+# Comment: ----- Follow this pattern for up to 5 authors
+AddTitle: TRUE # Use FALSE when submitting to peer reviewed platform. This will remove author names.
+Author1: "Joshua Strydom^[__Contributions:__  \\newline _The authors would like to thank no institution for money donated to this project. Thank you sincerely._]"  # First Author - note the thanks message displayed as an italic footnote of first page.
+Ref1: "Stellenbosch University, Stellenbosch, South Africa" # First Author's Affiliation
+Email1: "20718284\\@sun.ac.za" # First Author's Email address
+
+#Author2: "John Smith"
+#Ref2: "Some other Institution, Cape Town, South Africa"
+#Email2: "John\\@gmail.com"
+#CommonAffiliation_12: TRUE # If Author 1 and 2 have a common affiliation. Works with _13, _23, etc.
+
+#Author3: "John Doe"
+#Email3: "Joe\\@gmail.com"
+
+#CorrespAuthor_1: TRUE  # If corresponding author is author 3, e.g., use CorrespAuthor_3: TRUE
+
+# Comment out below to remove both. JEL Codes only given if keywords also given.
+#keywords: "Multivariate GARCH \\sep Kalman Filter \\sep Copula" # Use \\sep to separate
+#JELCodes: "L250 \\sep L100"
+
+# ----- Manage headers and footers:
+#BottomLFooter: $Title$
+#BottomCFooter:
+#TopLHeader: \leftmark # Adds section name at topleft. Remove comment to add it.
+BottomRFooter: "\\footnotesize Page \\thepage" # Add a '#' before this line to remove footer.
+addtoprule: TRUE
+addfootrule: TRUE               # Use if footers added. Add '#' to remove line.
+
+# --------- page margins:
+margin: 2.3 # Sides
+bottom: 2 # bottom
+top: 2.5 # Top
+HardSet_layout: TRUE # Hard-set the spacing of words in your document. This will stop LaTeX squashing text to fit on pages, e.g.
+# This is done by hard-setting the spacing dimensions. Set to FALSE if you want LaTeX to optimize this for your paper.
+
+# --------- Line numbers
+linenumbers: FALSE # Used when submitting to journal
+
+# ---------- References settings:
+# You can download cls format here: https://www.zotero.org/ - simply search for your institution. You can also edit and save cls formats here: https://editor.citationstyles.org/about/
+# Hit download, store it in Tex/ folder, and change reference below - easy.
+bibliography: Tex/ref.bib       # Do not edit: Keep this naming convention and location.
+csl: Tex/harvard-stellenbosch-university.csl # referencing format used.
+# By default, the bibliography only displays the cited references. If you want to change this, you can comment out one of the following:
+#nocite: '@*' # Add all items in bibliography, whether cited or not
+# nocite: |  # add specific references that aren't cited
+#  @grinold2000
+#  @Someoneelse2010
+
+# ---------- General:
+RemovePreprintSubmittedTo: TRUE  # Removes the 'preprint submitted to...' at bottom of titlepage
+Journal: "Journal of Finance"   # Journal that the paper will be submitting to, if RemovePreprintSubmittedTo is set to TRUE.
+toc: FALSE                       # Add a table of contents
+numbersections: TRUE             # Should sections (and thus figures and tables) be numbered?
+fontsize: 11pt                  # Set fontsize
+linestretch: 1.2                # Set distance between lines.
+link-citations: TRUE            # This creates dynamic links to the papers in reference list.
+
+### Adding additional latex packages:
+# header-includes:
+#    - \usepackage{colortbl} # Add additional packages here.
+
+output:
+  pdf_document:
+    keep_tex: TRUE
+    template: Tex/TexDefault.txt
+    fig_width: 3.5 # Adjust default figure sizes. This can also be done in the chunks of the text.
+    fig_height: 3.5
+#abstract: |
+#  Abstract to be written here. The abstract should not be too long and should provide the reader with a good understanding what you are writing about. Academic papers are not like novels where you keep the reader in suspense. To be effective in getting others to read your paper, be as open and concise about your findings here as possible. Ideally, upon reading your abstract, the reader should feel he / she must read your paper in entirety.
+---
+
+<!-- First: Set your default preferences for chunk options: -->
+
+<!-- If you want a chunk's code to be printed, set echo = TRUE. message = FALSE stops R printing ugly package loading details in your final paper too. I also suggest setting warning = FALSE and checking for warnings in R, else you might find ugly warnings in your paper. -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5, fig.pos="H", fig.pos = 'H')
+pacman::p_load("tidyr", "tbl2xts","devtools","lubridate", "readr", "PerformanceAnalytics", "ggplot2", "dplyr", "rmsfuns", "tibble", "knitr", "lubridate", "pacman", "PortRisk", "psych", "quadprog", "RcppRoll", "rmarkdown", "rmgarch", "rportfolio", "tbl2xts", "Texevier", "tidyfit", "tidyverse", "broom", "xts", "zoo", "factoextra", "FactoMineR", "fEcofin", "fmxdat", "glue", "huxtable")
+pacman::p_load("MTS", "robustbase")
+pacman::p_load("tidyverse", "devtools", "rugarch", "rmgarch", 
+    "forecast", "tbl2xts", "lubridate", "PerformanceAnalytics", 
+    "ggthemes")
+library(psych)
+msci <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/msci.rds")
+bonds <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/bonds_10y.rds") 
+comms <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/comms.rds")
+
+
+```
+
+```{r data, include=FALSE}
+MSCI <- msci |> 
+    filter(Name %in% c("MSCI_RE", "MSCI_ACWI")) |> 
+    spread(Name, Price) |> 
+    tbl_xts()
+BCOM <- comms |> 
+    filter(Name %in% "Bcom_Index") |> 
+    spread(Name, Price) |> 
+    tbl_xts()
+USBond_10 <- bonds |> 
+    filter(Name %in% "US_10Yr") |> 
+    spread(Name, Bond_10Yr) |> 
+    mutate(US_10 = US_10Yr/100) |> 
+    select(-US_10Yr) |> 
+    mutate(dlogret = log(1+US_10)) |> 
+    gather(Tickers, dlogret, -date) |> 
+    filter(Tickers %in% "dlogret") 
+USBond_10$Tickers <- gsub("dlogret", "US_10Yr", USBond_10$Tickers)
+
+FULL <- merge(MSCI, BCOM, all = TRUE) |> 
+    xts_tbl() |> 
+    gather(Tickers, Price, -date) |> 
+    group_by(Tickers) |> 
+    mutate(dlogret = log(Price) - log(lag(Price))) |> 
+    select(-Price) |>
+    bind_rows(USBond_10) |> 
+    mutate(scaledret = (dlogret - mean(dlogret, na.rm = TRUE))) |> 
+    filter(date > dplyr::first(date)) |> 
+    ungroup()
+xts_FULL <- FULL %>% tbl_xts(., cols_to_xts = "dlogret", spread_by = "Tickers") |> 
+    na.omit()
+
+```
+
+```{r GARCH, include=FALSE}
+DCCPre <- dccPre(xts_FULL, include.mean = TRUE, p = 0)
+Vol <- DCCPre$marVol
+colnames(Vol) <- colnames(xts_FULL)
+Vol <- 
+  data.frame( cbind( date = index(xts_FULL), Vol)) %>% # Add date column which dropped away...
+  mutate(date = as.Date(date)) %>%  tibble::as.tibble()  # make date column a date column...
+TidyVol <- Vol %>% gather(Tickers, Sigma, -date)
+StdRes <- DCCPre$sresi
+detach("package:tidyverse", unload=TRUE)
+detach("package:tbl2xts", unload=TRUE)
+DCC <- dccFit(StdRes, type="Engle")
+pacman::p_load("tidyverse", "tbl2xts", "broom")
+Rhot <- DCC$rho.t
+ReturnSeries = xts_FULL
+DCC.TV.Cor = Rhot
+
+renamingdcc <- function(ReturnSeries, DCC.TV.Cor) {
+  
+ncolrtn <- ncol(ReturnSeries)
+namesrtn <- colnames(ReturnSeries)
+paste(namesrtn, collapse = "_")
+
+nam <- c()
+xx <- mapply(rep, times = ncolrtn:1, x = namesrtn)
+# Now let's be creative in designing a nested for loop to save the names corresponding to the columns of interest.. 
+
+# TIP: draw what you want to achieve on a paper first. Then apply code.
+
+# See if you can do this on your own first.. Then check vs my solution:
+
+nam <- c()
+for (j in 1:(ncolrtn)) {
+for (i in 1:(ncolrtn)) {
+  nam[(i + (j-1)*(ncolrtn))] <- paste(xx[[j]][1], xx[[i]][1], sep="_")
+}
+}
+
+colnames(DCC.TV.Cor) <- nam
+
+# So to plot all the time-varying correlations wrt SBK:
+ # First append the date column that has (again) been removed...
+DCC.TV.Cor <- 
+    data.frame( cbind( date = index(ReturnSeries), DCC.TV.Cor)) %>% # Add date column which dropped away...
+    mutate(date = as.Date(date)) %>%  tbl_df() 
+
+DCC.TV.Cor <- DCC.TV.Cor %>% gather(Pairs, Rho, -date)
+
+DCC.TV.Cor
+
+}
+
+# Let's see if our function works! Excitement!
+Rhot <- 
+  renamingdcc(ReturnSeries = xts_FULL, DCC.TV.Cor = Rhot)
+
+head(Rhot %>% arrange(date))
+msci_plotdata <- msci |> 
+    group_by(Name) |> 
+    arrange(date) |> 
+    mutate(Returns = log(Price) - log(lag(Price))) |> 
+    filter(date > dplyr::first(date)) |> 
+    ungroup()
+g1 <- 
+  ggplot(Rhot %>% filter(grepl("MSCI_ACWI_", Pairs ), !grepl("_MSCI_ACWI", Pairs)) ) + 
+  geom_line(aes(x = date, y = Rho, colour = Pairs)) + 
+  theme_hc() +
+  ggtitle("Dynamic Conditional Correlations: MSCI_ACWI")
+#g2 <- g1 %+% subset(Rhot |> filter(grepl("MSCI_RE_", Pairs ), !grepl("_MSCI_RE", Pairs))) +
+#    ggtitle("Dynamic Conditional Correlations: MSCI_RE")
+#g3 <- g1 %+% subset(Rhot %>% filter(grepl("Bcom_Index_", Pairs ), !grepl("_Bcom_Index", Pairs))) + 
+#    ggtitle("Dynamic Conditional Correlations: Bcom_Index")
+#g4 <- 
+#  g1 %+% subset(Rhot %>% filter(grepl("US_10Yr_", Pairs ), !grepl("_US_10Yr", Pairs))) + ggtitle("Dynamic Conditional Correlations: US_10Yr")
+```
+
+
+<!-- ############################## -->
+<!-- # Start Writing here: -->
+<!-- ############################## -->
+
+# Introduction \label{Introduction}
+
+Need to use multivariate volatility modelling to determine the comovement of assets. The higher the correlation, the lower the diversification. Time-varying correlation estimates prvode insight into the underlying comovement structures of a portfolio of assets. 
+
+First, I need to combine the data to make an appropriate return series. Of particular interest is the MSCI_RE (real estate), MSCI_ACWI (equities), Bcom_index (commodities) and the US 10 year bond yield. The US 10 year bond, being a yield, is divided by 100 to make it comparable to the other series'. The MARCH test indicates that all the MV portmanteau tests reject the null of no conditional heteroskedasticity, motivating our use of MVGARCH models.
+
+# Volatility of indices
+
+```{r Figure1,  warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure1}", fig.ext = 'png', fig.height = 3, fig.width = 6}
+ggplot(TidyVol) + geom_line(aes(x = date, y = Sigma, colour = Tickers))
+```
+
+From the Figure \ref{Figure1}, it is clear that the MSCI_RE is the most volatile asset class. 
+
+# Time-varying conditional correlations
+
+```{r Figure2, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure2}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+
+print(g1)
+```
+
+Figure \ref{Figure2} displays the dynamic conditional correlation for MSCI_ACWI. An issue with packages limited my analysis to only one correlation. I was, however, able to manually print the other graphs but couldn't knit them. 
+
+# MSCI analysis
+
+```{r Figure3, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure3}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+msci_plot <- ggplot(msci_plotdata) +
+    geom_line(aes(x = date, y = Returns, color = Name, alpha = 0.9)) +
+    ggtitle("Log Returns") +
+    guides(alpha = "none")
+msci_plot
+```
+
+Figure \ref{Figure3} displays the log returns of the various MSCI indices. 
+
+```{r Figure4, warning =  FALSE, fig.align = 'center', fig.cap = "Caption Here \\label{Figure4}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+msci_plotdata %>% 
+    ggplot() + 
+    geom_line(aes(date, Returns)) + facet_wrap(~Name) + theme_bw()
+```
+
+Figure \ref{Figure4} displays the same as Figure \ref{Figure3}. The return profiles seem to have converged over the past decade, with a few exceptions. The most recent 'exception' is that of the 2020 spike due to the pandemic. 
+
+
+# Conclusion
+
+Over the past decade, the return profiles of different asset classes have increased in their convergence. 
+

@@ -1,0 +1,118 @@
+---
+title: "Powerpoint"
+output: powerpoint_presentation
+date: "2022-11-25"
+---
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(echo = FALSE)
+pacman::p_load("tidyr", "tbl2xts","devtools","lubridate", "readr", "PerformanceAnalytics", "ggplot2", "dplyr", "rmsfuns", "tibble", "knitr", "lubridate", "pacman", "PortRisk", "psych", "quadprog", "RcppRoll", "rmarkdown", "rmgarch", "rportfolio", "tbl2xts", "Texevier", "tidyfit", "tidyverse", "broom", "xts", "zoo", "factoextra", "FactoMineR", "fEcofin", "fmxdat", "glue", "huxtable")
+library(fmxdat)
+```
+
+```{r Load data, include=FALSE}
+library(tidyverse)
+library(dplyr)
+library(tbl2xts)
+library(lubridate)
+library(fmxdat)
+ASISA <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/ASISA.rds")
+BM <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/Capped_SWIX.rds")
+AI_Fund <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/AI_Max_Fund.rds")
+```
+
+```{r Data manipulation, include=FALSE}
+library(dplyr, tbl2xts)
+ASISA.tbl <- ASISA |> 
+    arrange(date) |> 
+    group_by(Name) |> 
+    filter(date > dplyr::first(date)) |> 
+    mutate(Returns = coalesce(Returns, 0)) |> 
+    mutate(CP = cumprod(1+Returns)) |> 
+    ungroup() |>
+    rename(Tickers = Name)
+BM.tbl <- BM |> 
+    arrange(date) |> 
+    mutate(Rets = coalesce(Returns, 0)) |> 
+    mutate(CP = cumprod(1+Rets)) |> 
+    ungroup() 
+AI_Fund.tbl <- AI_Fund |> 
+    select(date, Tickers, Returns) |> 
+    arrange(date) |> 
+    mutate(Rets = coalesce(Returns, 0)) |> 
+    mutate(CP = cumprod(1 + Rets)) |> 
+    ungroup() 
+randomdraw <- sample(1:227, 27)
+ASISA.roll <- ASISA.tbl |> 
+    filter(Tickers %in% c("Fund_193", "Fund_149", "Fund_96", "Fund_33", "Fund_21", "Fund_122", "Fund_72", "Fund_99", "Fund_7", "Fund_211", "Fund_226", "Fund_198", "Fund_144", "Fund_106", "Fund_223", "Fund_209", "Fund_188", "Fund_163", "Fund_152", "Fund_43", "Fund_32", "Fund_169", "Fund_94", "Fund_11", "Fund_138", "Fund_67", "Fund_16")) |> 
+    mutate(Rets = coalesce(Returns, 0)) |> 
+    select(date, Tickers, Returns, Rets, CP)
+    
+```
+
+```{r Joining, include = FALSE}
+longfunds <- bind_rows(AI_Fund.tbl, BM.tbl, ASISA.roll)
+longfunds_plot <- ggplot(longfunds) + 
+    geom_line(aes(date, CP, color = Tickers)) + 
+    labs(title = "Cumulative Returns of various Indices", 
+    subtitle = "", caption = "Note:\nDistortions emerge as starting dates differ.") #+ 
+    #theme_fmx(title.size = ggpts(20), subtitle.size = ggpts(5), 
+    #    caption.size = ggpts(15), CustomCaption = T)
+```
+
+
+```{r data, include=FALSE}
+library(Rcpp)
+library(RcppRoll)
+plotdf <- longfunds %>% group_by(Tickers) %>% mutate(RollRets = RcppRoll::roll_prod(1 + Returns, 36, fill = NA, 
+    align = "right")^(12/36) - 1) %>% group_by(date) %>% filter(any(!is.na(RollRets))) %>% ungroup()
+g <- plotdf %>% 
+    ggplot() + 
+    geom_line(aes(date, RollRets, color = Tickers), alpha = 0.7, size = 0.75) + 
+    labs(title = "Rolling 3 Year Annualized Returns of various Indices", 
+    subtitle = "", x = "", y = "Rolling 3 year Returns (Ann.)", 
+    caption = "Note:\nDistortions are not evident now.") #+ 
+    #theme_fmx(title.size = ggpts(30), subtitle.size = ggpts(5), caption.size = ggpts(25), CustomCaption = T) + 
+    #fmx_cols()
+plot_dlog <- longfunds |> 
+    mutate(logreturns = log(Returns + 1)) |> 
+    select(date, Tickers, logreturns) |> 
+    mutate(RollSD = RcppRoll::roll_sd(1 + logreturns, 36, fill = NA, align = "right") * sqrt(12)) |> 
+    filter(!is.na(RollSD))
+gg <- plot_dlog |> 
+    ggplot() + 
+    geom_line(aes(date, RollSD, color = Tickers), alpha = 0.7, size = 0.75) + 
+    labs(title = "Illustration of Rolling 3 Year Annualized SD of various Indices with differing start dates", 
+    subtitle = "", x = "", y = "Rolling 3 year Returns (Ann.)", 
+    caption = "Note:\nDistortions are not evident now.") #+ 
+    #theme_fmx(title.size = ggpts(30), subtitle.size = ggpts(5), caption.size = ggpts(25), CustomCaption = T) + 
+    #fmx_cols()
+LogReturns <- longfunds_plot +
+    coord_trans(y = "log10") + 
+    labs(title = paste0(longfunds_plot$labels$title, 
+    "\nLog Scaled"), y = "Log Scaled Cumulative Returns")
+RollingReturns <- finplot(g, x.date.dist = "1 year", x.date.type = "%Y", x.vert = T, y.pct = T, y.pct_acc = 1)
+StandardDeviation <- finplot(gg, x.date.dist = "1 year", x.date.type = "%Y", x.vert = T, 
+    y.pct = T, y.pct_acc = 1)
+```
+
+
+## Cumulative log returns
+
+```{r Figure1, warning =  FALSE, fig.align = 'center', fig.cap = "Log returns \\label{Figure1}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+print(LogReturns)
+```
+
+
+## Rolling returns
+
+```{r Figure2, warning =  FALSE, fig.align = 'center', fig.cap = "Rolling returns \\label{Figure2}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+print(RollingReturns)
+```
+
+## Standard deviation of rolling returns
+
+```{r Figure3, warning =  FALSE, fig.align = 'center', fig.cap = "Standard deviation \\label{Figure3}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+print(StandardDeviation)
+```
+

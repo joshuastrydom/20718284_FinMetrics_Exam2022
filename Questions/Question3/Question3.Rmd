@@ -1,0 +1,314 @@
+---
+# IMPORTANT: Change settings here, but DO NOT change the spacing.
+# Remove comments and add values where applicable.
+# The descriptions below should be self-explanatory
+
+title: "Question 3"
+#subtitle: "This will appear as Right Header"
+
+documentclass: "elsarticle"
+
+# --------- Thesis title (Optional - set to FALSE by default).
+# You can move the details below around as you please.
+Thesis_FP: FALSE
+# Entry1: "An unbelievable study with a title spanning multiple lines."
+# Entry2: "\\textbf{Nico Katzke}" # textbf for bold
+# Entry3: "A thesis submitted toward the degree of Doctor of Philosophy"
+# Uni_Logo: Tex/Logo.png # Place a logo in the indicated location (from your root, e.g. defaults to ~/Tex/Logo.png) and uncomment this line. Leave uncommented for no image
+# Logo_width: 0.3 # If using a logo - use this to set width (size) of image
+# Entry4: "Under the supervision of: \\vfill Prof. Joe Smith and Dr. Frank Smith"
+# Entry5: "Stellenbosch University"
+# Entry6: April 2020
+# Entry7:
+# Entry8:
+
+# --------- Front Page
+# Comment: ----- Follow this pattern for up to 5 authors
+AddTitle: TRUE # Use FALSE when submitting to peer reviewed platform. This will remove author names.
+Author1: "Joshua Strydom^[__Contributions:__  \\newline _The authors would like to thank no institution for money donated to this project. Thank you sincerely._]"  # First Author - note the thanks message displayed as an italic footnote of first page.
+Ref1: "Stellenbosch University, Stellenbosch, South Africa" # First Author's Affiliation
+Email1: "20718284\\@sun.ac.za" # First Author's Email address
+
+#Author2: "John Smith"
+#Ref2: "Some other Institution, Cape Town, South Africa"
+#Email2: "John\\@gmail.com"
+#CommonAffiliation_12: TRUE # If Author 1 and 2 have a common affiliation. Works with _13, _23, etc.
+
+#Author3: "John Doe"
+#Email3: "Joe\\@gmail.com"
+
+#CorrespAuthor_1: TRUE  # If corresponding author is author 3, e.g., use CorrespAuthor_3: TRUE
+
+# Comment out below to remove both. JEL Codes only given if keywords also given.
+#keywords: "Multivariate GARCH \\sep Kalman Filter \\sep Copula" # Use \\sep to separate
+#JELCodes: "L250 \\sep L100"
+
+# ----- Manage headers and footers:
+#BottomLFooter: $Title$
+#BottomCFooter:
+#TopLHeader: \leftmark # Adds section name at topleft. Remove comment to add it.
+BottomRFooter: "\\footnotesize Page \\thepage" # Add a '#' before this line to remove footer.
+addtoprule: TRUE
+addfootrule: TRUE               # Use if footers added. Add '#' to remove line.
+
+# --------- page margins:
+margin: 2.3 # Sides
+bottom: 2 # bottom
+top: 2.5 # Top
+HardSet_layout: TRUE # Hard-set the spacing of words in your document. This will stop LaTeX squashing text to fit on pages, e.g.
+# This is done by hard-setting the spacing dimensions. Set to FALSE if you want LaTeX to optimize this for your paper.
+
+# --------- Line numbers
+linenumbers: FALSE # Used when submitting to journal
+
+# ---------- References settings:
+# You can download cls format here: https://www.zotero.org/ - simply search for your institution. You can also edit and save cls formats here: https://editor.citationstyles.org/about/
+# Hit download, store it in Tex/ folder, and change reference below - easy.
+bibliography: Tex/ref.bib       # Do not edit: Keep this naming convention and location.
+csl: Tex/harvard-stellenbosch-university.csl # referencing format used.
+# By default, the bibliography only displays the cited references. If you want to change this, you can comment out one of the following:
+#nocite: '@*' # Add all items in bibliography, whether cited or not
+# nocite: |  # add specific references that aren't cited
+#  @grinold2000
+#  @Someoneelse2010
+
+# ---------- General:
+RemovePreprintSubmittedTo: TRUE  # Removes the 'preprint submitted to...' at bottom of titlepage
+Journal: "Journal of Finance"   # Journal that the paper will be submitting to, if RemovePreprintSubmittedTo is set to TRUE.
+toc: FALSE                       # Add a table of contents
+numbersections: TRUE             # Should sections (and thus figures and tables) be numbered?
+fontsize: 11pt                  # Set fontsize
+linestretch: 1.2                # Set distance between lines.
+link-citations: TRUE            # This creates dynamic links to the papers in reference list.
+
+### Adding additional latex packages:
+# header-includes:
+#    - \usepackage{colortbl} # Add additional packages here.
+
+output:
+  pdf_document:
+    keep_tex: TRUE
+    template: Tex/TexDefault.txt
+    fig_width: 3.5 # Adjust default figure sizes. This can also be done in the chunks of the text.
+    fig_height: 3.5
+#abstract: |
+#  Abstract to be written here. The abstract should not be too long and should provide the reader with a good understanding what you are writing about. Academic papers are not like novels where you keep the reader in suspense. To be effective in getting others to read your paper, be as open and concise about your findings here as possible. Ideally, upon reading your abstract, the reader should feel he / she must read your paper in entirety.
+---
+
+<!-- First: Set your default preferences for chunk options: -->
+
+<!-- If you want a chunk's code to be printed, set echo = TRUE. message = FALSE stops R printing ugly package loading details in your final paper too. I also suggest setting warning = FALSE and checking for warnings in R, else you might find ugly warnings in your paper. -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5, fig.pos="H", fig.pos = 'H')
+if(!require("tidyverse")) install.packages("tidyverse")
+library(tidyverse)
+library(PerformanceAnalytics)
+library(TTR)
+library(fmxdat)
+library(dplyr)
+library(tbl2xts)
+T40 <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/T40.rds")
+RebDays <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/Rebalance_days.rds")
+```
+
+```{r data, include=FALSE}
+T40 <- T40 |> 
+    mutate(J200 = ifelse(is.na(J200), 0, J200),
+           J400 = ifelse(is.na(J400), 0, J400)) |> 
+    mutate(ALSIreturn = Return*J200) |> 
+    mutate(SWIXreturn = Return*J400) |> 
+    mutate(ALSIreturn = ifelse(is.na(ALSIreturn), 0, ALSIreturn),
+           SWIXreturn = ifelse(is.na(SWIXreturn), 0, SWIXreturn))
+J200_dailyreturns <- aggregate(x = T40["ALSIreturn"],
+                     FUN = sum,
+                     by = list(Date = T40$date)) |> 
+    gather(Index, Return, -Date) |>
+    mutate(CumRet = cumprod(1 + Return))
+J200_spread <- J200_dailyreturns |> 
+    tbl_xts(cols_to_xts = CumRet, spread_by = Index)
+
+J400_dailyreturns <- aggregate(x = T40["SWIXreturn"],
+                     FUN = sum,
+                     by = list(Date = T40$date)) |> 
+    gather(Index, Return, -Date) |>
+    mutate(CumRet = cumprod(1 + Return))
+J400_spread <- J400_dailyreturns |> 
+    tbl_xts(cols_to_xts = CumRet, spread_by = Index)
+
+ALSI_SWIX <- merge.xts(J200_spread, J400_spread, all = TRUE) |> 
+    xts_tbl() |> 
+    gather(key = "Index", value = "CumReturns", -date)
+
+J200_spread.roll <- J200_dailyreturns |> 
+    tbl_xts(cols_to_xts = Return, spread_by = Index)
+names(J200_spread.roll)[1] <- 'ALSI'
+J400_spread.roll <- J400_dailyreturns |> 
+    tbl_xts(cols_to_xts = Return, spread_by = Index)
+names(J400_spread.roll)[1] <- 'SWIX'
+
+ALSI_SWIX.xts <- merge.xts(J200_spread.roll, J400_spread.roll, all = TRUE)
+ALSI_SWIX_plot.xts <- bind_rows(
+      ALSI_SWIX.xts %>% tail(6) %>% PerformanceAnalytics::Return.annualized(., scale = 12) %>% data.frame() %>% mutate(Freq = "A"),
+      
+      ALSI_SWIX.xts %>% tail(12) %>% PerformanceAnalytics::Return.annualized(., scale = 12) %>% data.frame() %>% mutate(Freq = "B"),
+      
+      ALSI_SWIX.xts %>% tail(36) %>% PerformanceAnalytics::Return.annualized(., scale = 12) %>% data.frame() %>% mutate(Freq = "C"),
+      
+      ALSI_SWIX.xts %>% tail(60) %>% PerformanceAnalytics::Return.annualized(., scale = 12) %>% data.frame() %>% mutate(Freq = "D"),
+      
+    ) %>% data.frame() %>% gather(Tickers, mu, -Freq)
+
+to_string <- as_labeller(c(`A` = "6 Months", `B` = "1 Year", `C` = "3 Years", `D` = "5 Years"))
+
+T40_J200 <- T40 |> 
+    select(-J400, -Short.Name, -SWIXreturn) |>
+    group_by(Tickers) |>
+    arrange(date) |>
+    ungroup() |> 
+    mutate(Tickers = gsub(" SJ Equity", "", Tickers)) |> 
+    mutate(ALSIreturn = ifelse(is.na(ALSIreturn), 0, ALSIreturn))
+T40_J400 <- T40 |> 
+    select(-J200, -Short.Name, -ALSIreturn) |>
+    group_by(Tickers) |>
+    arrange(date) |>
+    ungroup() |> 
+    mutate(Tickers = gsub(" SJ Equity", "", Tickers))
+
+J200_large <- T40_J200 |> 
+    filter(Index_Name %in% "Large_Caps")
+J200_large <- aggregate(x = J200_large["ALSIreturn"],
+                     FUN = sum,
+                     by = list(Date = J200_large$date)) |> 
+    gather(Index, Return, -Date) |>
+    mutate(CumRet = cumprod(1 + Return)) |> 
+    tbl_xts(cols_to_xts = CumRet, spread_by = Index)
+
+J400_large <- T40_J400 |> 
+    filter(Index_Name %in% "Large_Caps")
+J400_large <- aggregate(x = J400_large["SWIXreturn"],
+                     FUN = sum,
+                     by = list(Date = J400_large$date)) |> 
+    gather(Index, Return, -Date) |>
+    mutate(CumRet = cumprod(1 + Return)) |> 
+    tbl_xts(cols_to_xts = CumRet, spread_by = Index)
+ALSI_SWIX_large <- merge.xts(J200_large, J400_large, all = TRUE) |> 
+    xts_tbl() |> 
+    gather(key = "Index", value = "CumReturns", -date)
+
+J200_mid <- T40_J200 |> 
+    filter(Index_Name %in% "Mid_Caps")
+J200_mid <- aggregate(x = J200_mid["ALSIreturn"],
+                     FUN = sum,
+                     by = list(Date = J200_mid$date)) |> 
+    gather(Index, Return, -Date) |>
+    mutate(CumRet = cumprod(1 + Return)) |> 
+    tbl_xts(cols_to_xts = CumRet, spread_by = Index)
+
+J400_mid <- T40_J400 |> 
+    filter(Index_Name %in% "Mid_Caps")
+J400_mid <- aggregate(x = J400_mid["SWIXreturn"],
+                     FUN = sum,
+                     by = list(Date = J400_mid$date)) |> 
+    gather(Index, Return, -Date) |>
+    mutate(CumRet = cumprod(1 + Return)) |> 
+    tbl_xts(cols_to_xts = CumRet, spread_by = Index)
+ALSI_SWIX_mid <- merge.xts(J200_mid, J400_mid, all = TRUE) |> 
+    xts_tbl() |> 
+    gather(key = "Index", value = "CumReturns", -date)
+
+J200_small <- T40_J200 |> 
+    filter(Index_Name %in% "Small_Caps")
+J200_small <- aggregate(x = J200_small["ALSIreturn"],
+                     FUN = sum,
+                     by = list(Date = J200_small$date)) |> 
+    gather(Index, Return, -Date) |>
+    mutate(CumRet = cumprod(1 + Return)) |> 
+    tbl_xts(cols_to_xts = CumRet, spread_by = Index)
+
+J400_small <- T40_J400 |> 
+    filter(Index_Name %in% "Small_Caps")
+J400_small <- aggregate(x = J400_small["SWIXreturn"],
+                     FUN = sum,
+                     by = list(Date = J400_small$date)) |> 
+    gather(Index, Return, -Date) |>
+    mutate(CumRet = cumprod(1 + Return)) |> 
+    tbl_xts(cols_to_xts = CumRet, spread_by = Index)
+ALSI_SWIX_small <- merge.xts(J200_small, J400_small, all = TRUE) |> 
+    xts_tbl() |> 
+    gather(key = "Index", value = "CumReturns", -date)
+
+```
+
+
+<!-- ############################## -->
+<!-- # Start Writing here: -->
+<!-- ############################## -->
+
+# ALSI and SWIX \label{ALSISWIX}
+
+
+```{r Figure1,  warning =  FALSE, fig.align = 'center', fig.cap = "Cumulative returns \\label{Figure1}", fig.ext = 'png', fig.height = 3, fig.width = 6}
+
+ggplot(ALSI_SWIX) +
+    geom_line(aes(date, CumReturns, color = Index)) +
+    ggtitle("Cumulative returns of ALSI and SWIX")
+
+```
+
+The ALSI and the SWIX have, over the past decade, followed each other closely in terms of cumulative returns. The SWIX seemed to have consistently outperformed the ALSI from approximately 2011 to 2020. Post-2020, the ALSI has outperformed the SWIX. 
+
+
+```{r Figure2, warning =  FALSE, fig.align = 'center', fig.cap = "Rolling returns \\label{Figure2}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+
+ALSISWIXg <- ALSI_SWIX_plot.xts |> 
+    ggplot() + 
+    geom_bar( aes(Tickers, mu, fill = Tickers), stat="identity") + 
+    facet_wrap(~Freq, labeller = to_string, nrow = 1) + 
+    labs(x = "", y = "Returns (Ann.)" , caption = "Note:\nReturns in excess of a year are in annualized terms.") +
+    fmx_fills() + 
+    geom_label(aes(Tickers, mu, label = paste0( round(mu, 4)*100, "%" )), size = ggpts(8), alpha = 0.35, fontface = "bold", nudge_y = 0.002) + 
+    #theme_fmx(CustomCaption = T, title.size = ggpts(43), subtitle.size = ggpts(38), 
+    #            caption.size = ggpts(30), 
+            
+    #            axis.size = ggpts(37), 
+            
+    #            legend.size = ggpts(35),legend.pos = "top") +
+    theme(axis.text.x = element_blank(), axis.title.y = element_text(vjust=2)) + 
+    theme(strip.text.x = element_text(face = "bold", size = ggpts(35), margin = margin(.1, 0, .1, 0, "cm")))
+ALSISWIXg
+
+```
+
+Figures \ref{Figure2} displays the returns generated by the ALSI and SWIX over a 6 month, 1 year, 3 year and 5 year period. The only time that the SWIX outperformed the ALSI was over the 5 year period. The outperformance, however, was by a meagre 0.29%. The longer an individual intends for their money to be in the market, the more attractive the SWIX becomes in a relative sense. 
+
+# Large, Mid and Small cap contributions to returns 
+
+```{r Figure3, warning =  FALSE, fig.align = 'center', fig.cap = "Large caps \\label{Figure3}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+ggplot(ALSI_SWIX_large) +
+    geom_line(aes(date, CumReturns, color = Index)) +
+    ggtitle("Large cap cumulative contribution")
+```
+
+Seeing as though the SWIX and ALSI are predominantly made up of large cap stocks, the choice of such stocks is very important. The contribution to cumulative returns by large cap stocks has been historically larger for the SWIX than for the ALSI. This is not, however, the case post-2020 as the cumulative returns for the ALSI are larger than that of the SWIX.  
+
+```{r Figure4, warning =  FALSE, fig.align = 'center', fig.cap = "Mid caps \\label{Figure4}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+ggplot(ALSI_SWIX_mid) +
+    geom_line(aes(date, CumReturns, color = Index)) +
+    ggtitle("Mid cap cumulative contribution")
+```
+
+Mid cap cumulative returns for both indices have tracked each other reasonably well, with the ALSI generally just outperforming the SWIX. The actual contribution of these stocks to overall cumulative returns have not been that high though. 
+
+```{r Figure5, warning =  FALSE, fig.align = 'center', fig.cap = "Small caps \\label{Figure5}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+ggplot(ALSI_SWIX_small) +
+    geom_line(aes(date, CumReturns, color = Index)) +
+    ggtitle("Small cap cumulative contribution")
+```
+
+The contribution of small cap stocks to cumulative returns is at best marginal. Small cap stocks within the SWIX seem to be 'better' than those of the ALSI. The sample does not extend past 2018 though. 
+
+# Conclusion
+
+The ALSI and SWIX have largely performed equally well. The performance of different size indexes, sector exposures and stock concentration over time are very important. 
+

@@ -1,0 +1,449 @@
+---
+# IMPORTANT: Change settings here, but DO NOT change the spacing.
+# Remove comments and add values where applicable.
+# The descriptions below should be self-explanatory
+
+title: "Question 4"
+#subtitle: "This will appear as Right Header"
+
+documentclass: "elsarticle"
+
+# --------- Thesis title (Optional - set to FALSE by default).
+# You can move the details below around as you please.
+Thesis_FP: FALSE
+# Entry1: "An unbelievable study with a title spanning multiple lines."
+# Entry2: "\\textbf{Nico Katzke}" # textbf for bold
+# Entry3: "A thesis submitted toward the degree of Doctor of Philosophy"
+# Uni_Logo: Tex/Logo.png # Place a logo in the indicated location (from your root, e.g. defaults to ~/Tex/Logo.png) and uncomment this line. Leave uncommented for no image
+# Logo_width: 0.3 # If using a logo - use this to set width (size) of image
+# Entry4: "Under the supervision of: \\vfill Prof. Joe Smith and Dr. Frank Smith"
+# Entry5: "Stellenbosch University"
+# Entry6: April 2020
+# Entry7:
+# Entry8:
+
+# --------- Front Page
+# Comment: ----- Follow this pattern for up to 5 authors
+AddTitle: TRUE # Use FALSE when submitting to peer reviewed platform. This will remove author names.
+Author1: "Joshua Strydom^[__Contributions:__  \\newline _The authors would like to thank no institution for money donated to this project. Thank you sincerely._]"  # First Author - note the thanks message displayed as an italic footnote of first page.
+Ref1: "Stellenbosch University, Stellenbosch, South Africa" # First Author's Affiliation
+Email1: "20718284\\@sun.ac.za" # First Author's Email address
+
+#Author2: "John Smith"
+#Ref2: "Some other Institution, Cape Town, South Africa"
+#Email2: "John\\@gmail.com"
+#CommonAffiliation_12: TRUE # If Author 1 and 2 have a common affiliation. Works with _13, _23, etc.
+
+#Author3: "John Doe"
+#Email3: "Joe\\@gmail.com"
+
+#CorrespAuthor_1: TRUE  # If corresponding author is author 3, e.g., use CorrespAuthor_3: TRUE
+
+# Comment out below to remove both. JEL Codes only given if keywords also given.
+#keywords: "Multivariate GARCH \\sep Kalman Filter \\sep Copula" # Use \\sep to separate
+#JELCodes: "L250 \\sep L100"
+
+# ----- Manage headers and footers:
+#BottomLFooter: $Title$
+#BottomCFooter:
+#TopLHeader: \leftmark # Adds section name at topleft. Remove comment to add it.
+BottomRFooter: "\\footnotesize Page \\thepage" # Add a '#' before this line to remove footer.
+addtoprule: TRUE
+addfootrule: TRUE               # Use if footers added. Add '#' to remove line.
+
+# --------- page margins:
+margin: 2.3 # Sides
+bottom: 2 # bottom
+top: 2.5 # Top
+HardSet_layout: TRUE # Hard-set the spacing of words in your document. This will stop LaTeX squashing text to fit on pages, e.g.
+# This is done by hard-setting the spacing dimensions. Set to FALSE if you want LaTeX to optimize this for your paper.
+
+# --------- Line numbers
+linenumbers: FALSE # Used when submitting to journal
+
+# ---------- References settings:
+# You can download cls format here: https://www.zotero.org/ - simply search for your institution. You can also edit and save cls formats here: https://editor.citationstyles.org/about/
+# Hit download, store it in Tex/ folder, and change reference below - easy.
+bibliography: Tex/ref.bib       # Do not edit: Keep this naming convention and location.
+csl: Tex/harvard-stellenbosch-university.csl # referencing format used.
+# By default, the bibliography only displays the cited references. If you want to change this, you can comment out one of the following:
+#nocite: '@*' # Add all items in bibliography, whether cited or not
+# nocite: |  # add specific references that aren't cited
+#  @grinold2000
+#  @Someoneelse2010
+
+# ---------- General:
+RemovePreprintSubmittedTo: TRUE  # Removes the 'preprint submitted to...' at bottom of titlepage
+Journal: "Journal of Finance"   # Journal that the paper will be submitting to, if RemovePreprintSubmittedTo is set to TRUE.
+toc: FALSE                       # Add a table of contents
+numbersections: TRUE             # Should sections (and thus figures and tables) be numbered?
+fontsize: 11pt                  # Set fontsize
+linestretch: 1.2                # Set distance between lines.
+link-citations: TRUE            # This creates dynamic links to the papers in reference list.
+
+### Adding additional latex packages:
+# header-includes:
+#    - \usepackage{colortbl} # Add additional packages here.
+
+output:
+  pdf_document:
+    keep_tex: TRUE
+    template: Tex/TexDefault.txt
+    fig_width: 3.5 # Adjust default figure sizes. This can also be done in the chunks of the text.
+    fig_height: 3.5
+#abstract: |
+#  Abstract to be written here. The abstract should not be too long and should provide the reader with a good understanding what you are writing about. Academic papers are not like novels where you keep the reader in suspense. To be effective in getting others to read your paper, be as open and concise about your findings here as possible. Ideally, upon reading your abstract, the reader should feel he / she must read your paper in entirety.
+---
+
+<!-- First: Set your default preferences for chunk options: -->
+
+<!-- If you want a chunk's code to be printed, set echo = TRUE. message = FALSE stops R printing ugly package loading details in your final paper too. I also suggest setting warning = FALSE and checking for warnings in R, else you might find ugly warnings in your paper. -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5, fig.pos="H", fig.pos = 'H')
+if(!require("tidyverse")) install.packages("tidyverse")
+library(tidyverse)
+library(kableExtra)
+library(glue)
+library(rmsfuns)
+if (!require(FactoMineR)) install.packages("FactoMineR")
+if (!require(factoextra)) install.packages("factoextra")
+library(dplyr)
+library(xts)
+library(tbl2xts)
+T40 <- read_rds("~/Desktop/20718284_FinMetrics_Exam2022/data/T40.rds")
+```
+
+```{r data, include=FALSE}
+T40 <- T40 |> 
+    mutate(J200 = ifelse(is.na(J200), 0, J200),
+           J400 = ifelse(is.na(J400), 0, J400)) |> 
+    mutate(ALSIreturn = Return*J200) |> 
+    mutate(SWIXreturn = Return*J400) |> 
+    mutate(ALSIreturn = ifelse(is.na(ALSIreturn), 0, ALSIreturn),
+           SWIXreturn = ifelse(is.na(SWIXreturn), 0, SWIXreturn))
+J200_dailyreturnsQ4 <- aggregate(x = T40["ALSIreturn"],
+                     FUN = sum,
+                     by = list(Date = T40$date)) |> 
+    gather(Index, Return, -Date) |>
+    mutate(CumRet = cumprod(1 + Return))
+T40_J200 <- T40 |> 
+    select(-J400, -Short.Name, -SWIXreturn) |>
+    group_by(Tickers) |>
+    arrange(date) |>
+    ungroup() |> 
+    mutate(Tickers = gsub(" SJ Equity", "", Tickers)) |> 
+    mutate(ALSIreturn = ifelse(is.na(ALSIreturn), 0, ALSIreturn))
+J200mean <- T40_J200 |> 
+    group_by(Tickers) |> 
+    mutate(ALSIreturn = ALSIreturn - mean(ALSIreturn)) |> 
+    mutate(ALSIreturn = ifelse(is.na(ALSIreturn), 0, ALSIreturn)) |>
+    ungroup()
+tickerscontri <- T40_J200 |> 
+    select(date, Tickers, ALSIreturn) |> 
+    arrange(date) |> 
+    group_by(Tickers) |>
+    tbl2xts::tbl_xts(cols_to_xts = ALSIreturn, spread_by = Tickers) |> 
+    xts_tbl() |> 
+    gather(Tickers, ALSIreturn, -date)
+```
+
+```{r PCA, include=FALSE}
+data_hand <- J200mean |> 
+    select(date, Tickers, ALSIreturn) |> 
+    spread(Tickers, ALSIreturn) |> 
+    select_if(~ !any(is.na(.)))
+covmat <- cov(data_hand |> select(-date))
+evec <- eigen(covmat, symmetric = TRUE)$vector
+eval <- eigen(covmat, symmetric = TRUE)$values
+lambda <- diag(t(evec) %*% covmat %*% evec)
+prop = eval/sum(eval)
+prop <- tibble(Loadings = prop) |> 
+    mutate(PC = paste0("PC_", row_number()))
+prop[, "PC"][[1]] <- factor(prop[, "PC"][[1]], levels = prop$PC)
+names <- covmat %>% colnames
+evecdf <- tibble(data.frame(evec))
+evecdf <- evecdf %>% purrr::set_names(c(paste0("Eigenv_", 1:ncol(evecdf)))) %>% 
+    mutate(Names = names)
+gg1 <- evecdf %>% ggplot() + geom_bar(aes(Names, Eigenv_1), stat = "identity", 
+    fill = "steelblue") + 
+scale_y_continuous(breaks = scales::pretty_breaks(10), labels = scales::percent_format(accuracy = 1)) + 
+labs(x = "Principal Components", y = "Loadings: Eigenvector 1", 
+    title = "Eigenvector proportions\n", caption = "Source: Fmxdat Package")
+gg2 <- 
+evecdf %>% ggplot() + geom_bar(aes(Names, Eigenv_2), stat = "identity", 
+    fill = "steelblue") + 
+labs(x = "Principal Components", y = "Loadings: Eigenvector 2", 
+    title = "Eigenvector proportions\n", caption = "Source: Fmxdat Package") + 
+scale_y_continuous(breaks = scales::pretty_breaks(10), labels = scales::percent_format(accuracy = 1)) + 
+geom_text(aes(Names, Eigenv_2, label = glue::glue("{Names}: {round(Eigenv_2, 2)*100}%")), size = fmxdat::ggpts(8), angle = 45)
+T40_J200_wide <- T40_J200 |> select(date, Tickers, ALSIreturn) |> 
+    #mutate(ALSIreturn = ifelse(is.na(ALSIreturn), 0, ALSIreturn)) |> 
+    spread(Tickers, ALSIreturn) |> 
+    select_if(~ !any(is.na(.))) |> 
+    select(-date)
+res.pca <- PCA(T40_J200_wide, graph = FALSE)
+DimDesc <- 
+dimdesc(res.pca, 
+        axes = 1:3, # Which axes to check
+        proba = 0.05) # Significance level considered
+res.desc <- dimdesc(res.pca, axes = c(1, 2), proba = 0.05)
+```
+
+```{r rolling , include=FALSE}
+T40_J200_rolling <- T40 |>
+    mutate(Tickers = gsub(" SJ Equity", "", Tickers)) |> 
+    group_by(Tickers) |> 
+    arrange(date, .by_group = TRUE) |> 
+    select(date, Tickers, Return)
+pairwise_combos <- T40_J200_rolling |> 
+    full_join(T40_J200_rolling, by = "date") |> 
+    na.omit()
+pairwise_combos <- pairwise_combos %>%
+  ungroup() %>%  # important!! 
+# drop diagonal 
+  filter(Tickers.x != Tickers.y) %>% 
+# remove duplicate pairs (eg A-AAL, AAL-A)
+  mutate(Tickers = ifelse(Tickers.x < Tickers.y, glue("{Tickers.x}, {Tickers.y}"), glue("{Tickers.y}, {Tickers.x}"))) %>%
+  distinct(date, Tickers, .keep_all = TRUE) |> 
+    na.omit()
+period <- 60
+pairwise_corrs <- pairwise_combos %>%
+  group_by(Tickers) %>%
+  arrange(date, .by_group = TRUE) %>%
+  mutate(rollingcor = slider::slide2_dbl(
+    .x = Return.x, 
+    .y = Return.y, 
+    .f = ~cor(.x, .y), 
+    .before = period, 
+    .complete = TRUE)
+    ) %>%
+  select(date, Tickers, rollingcor) |> 
+    na.omit()
+pairwise_corrs <- pairwise_combos %>%
+  group_by(Tickers) %>%
+  arrange(date, .by_group = TRUE) %>%
+  mutate(rollingcor = slider::slide2_dbl(
+    .x = Return.x, 
+    .y = Return.y, 
+    .f = function(arg1, arg2) { cor(arg1, arg2) },  # the name of the args doesn't matter
+    .before = period, 
+    .complete = TRUE)
+    ) %>%
+  select(date, Tickers, rollingcor)
+mean_pw_cors <- pairwise_corrs |> 
+    group_by(date) |> 
+    summarise(mean_pw_corr = mean(rollingcor, na.rm = TRUE))
+```
+
+```{r stratification, include = FALSE}
+Idxs <- T40_J200 |> 
+    arrange(date) |> 
+    group_by(Tickers) |> 
+    #mutate(Return = Price / lag(Price)-1) %>% 
+    ungroup() |> 
+    select(date, Tickers, ALSIreturn) |> 
+    filter(!is.na(ALSIreturn)) |> 
+    mutate(YearMonth = format(date, "%Y%B"))
+
+# Winzorising:
+
+Idxs <- Idxs |> 
+    group_by(Tickers) |> 
+    mutate(Top = quantile(ALSIreturn, 0.99), Bot = quantile(ALSIreturn, 0.01)) |> 
+    mutate(Return = ifelse(ALSIreturn > Top, Top, ifelse(ALSIreturn < Bot, Bot, ALSIreturn))) |> 
+    ungroup()
+
+#zar <- T40 |> 
+#    mutate(J200.returns = Return*J200)
+
+ZARSD <- Idxs |> 
+    group_by(YearMonth) |> 
+    summarise(SD = sd(ALSIreturn)*sqrt(52)) |> 
+    na.omit() |> 
+  
+  # Top Decile Quantile overall (highly volatile month for ZAR:
+  mutate(TopQtile = quantile(SD, 0.8),
+         BotQtile = quantile(SD, 0.2))
+
+Hi_Vol <- ZARSD |> filter(SD > TopQtile) |> pull(YearMonth)
+
+Low_Vol <- ZARSD |> filter(SD < BotQtile) |> pull(YearMonth)
+
+# Create generic function to compare performance:
+
+Perf_comparisons <- function(Idxs, YMs, Alias){
+  # For stepping through uncomment:
+  YMs <- Hi_Vol
+  Unconditional_SD <- Idxs |> 
+      group_by(Tickers) |> 
+      mutate(Full_SD = sd(Return) * sqrt(252)) |> 
+      filter(YearMonth %in% YMs) |> 
+      summarise(SD = sd(Return) * sqrt(252), across(.cols = starts_with("Full"), .fns = max)) |> 
+      arrange(desc(SD)) |> 
+      mutate(Period = Alias) |> 
+      group_by(Tickers) |> 
+      mutate(Ratio = SD / Full_SD)
+    
+    Unconditional_SD
+  
+}
+
+perf_hi <- Perf_comparisons(Idxs, YMs = Hi_Vol, Alias = "High_Vol")
+```
+
+<!-- ############################## -->
+<!-- # Start Writing here: -->
+<!-- ############################## -->
+
+# Introduction \label{Introduction}
+
+I previously calculated the full daily return of the ALSI by summing the returns per day from each constituent stock in Question 3. I will continue to make use of this data. 
+
+
+```{r Figure1,  warning =  FALSE, fig.align = 'center', fig.cap = "ALSI cumulative returns \\label{Figure1}", fig.ext = 'png', fig.height = 3, fig.width = 6}
+
+ggplot(J200_dailyreturnsQ4) +
+    geom_line(aes(x = Date, y = CumRet, color = Index, alpha = 0.9)) +
+    ggtitle("J200 Sector returns") +
+    guides(alpha = 'none')
+
+```
+
+Figure \ref{Figure1} above displays the cumulative return of the ALSI. 
+
+# Principal Component Analysis \label{PCA}
+
+```{r Figure2, warning =  FALSE, fig.align = 'center', fig.cap = "Eigenvalue proportions \\label{Figure2}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+
+eigenprop <- prop %>% 
+ggplot() + geom_bar(aes(PC, Loadings), stat = "identity", fill = "steelblue") + theme(axis.text.x = element_text(size = 7)) +
+scale_y_continuous(breaks = scales::pretty_breaks(10), labels = scales::percent_format(accuracy = 1)) + 
+    
+labs(x = "Principal Components", y = "Loadings", title = "Eigenvalue proportions", 
+    caption = "Source: Fmxdat Package")
+eigenprop
+```
+
+Figure \ref{Figure2} says that nearly 55% of variation in the sectors are explained by a single component. The eigenvectors can be interpreted as the loadings or the weights of each PC. I will now look at the first two PC’s loadings so that I can make an interesting observation. 
+
+```{r Figure3, warning =  FALSE, fig.align = 'center', fig.cap = "Eigenvector proportions \\label{Figure3}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+fmxdat::finplot(gg1, x.vert = T)
+```
+
+I noted from the eigenvalues that a unique linear combination of all the sector returns can explain roughly 55% of the variation in the returns series. From Figure \ref{Figure3} above, I note that this unique combination does not have an equal weighted input for the series.
+
+```{r Figure4, warning =  FALSE, fig.align = 'center', fig.cap = "Eigenvector proportions \\label{Figure4}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+fmxdat::finplot(gg2, x.vert = T)
+```
+
+From Figure \ref{Figure4}, I note that the second eigenvalue (which explains about 27% of the total variation) loads nearly equally on AGL and BHP in the same direction but loads heavily on NPN in the opposite direction. This implies (loosely) that holding a long AGL and BHP position and a short NPN position explains a sizeable part of the total variation in these sectors' overall returns. 
+
+```{r Figure5, warning =  FALSE, fig.align = 'center', fig.cap = "PCA variables \\label{Figure5}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+fviz_pca_var(res.pca, col.var = "steelblue") + theme_minimal()
+```
+
+Figure \ref{Figure5} shows the relationship between all variables. Positively correlated variables are grouped together. The distance between variables and the origin measures the quality of the variables on the factor map. Variables that are away from the origin are well represented on the factor map. The closer a variable is to the unit circle of correlations, the better its representation on the factor map (and the more important it is to interpret these components)
+
+```{r contributions, results = 'asis'}
+library(huxtable)
+library(xtable)
+contributions <- res.pca$var$contrib #|> tibble::as_tibble()
+addtorow          <- list()
+  addtorow$pos      <- list()
+  addtorow$pos[[1]] <- c(0)
+  addtorow$command  <- c(paste("\\hline \n",
+                               "\\endhead \n",
+                               "\\hline \n",
+                               "{\\footnotesize Continued on next page} \n",
+                               "\\endfoot \n",
+                               "\\endlastfoot \n",sep=""))
+table <- xtable(contributions, caption = "Contributions of variables")
+  print.xtable(table,
+             tabular.environment = "longtable",
+             floating = FALSE, # Leave this as is.
+             table.placement = 'H', # Leave this as is.
+             booktabs = T, # Aesthetics
+             include.rownames = FALSE,  # Typically you don't want this in a table.
+             add.to.row = addtorow, # For adding the Continued on next page part...
+             comment = FALSE,
+             caption.placement = 'top',  # Where do you want the caption?
+             size="\\fontsize{12pt}{13pt}\\selectfont"  # Size of text in table..
+             )
+```
+
+The above table shows the contribution of the variables. I will now provide a visual representation of this. 
+
+```{r Figure6, warning =  FALSE, fig.align = 'center', fig.cap = "Contributions \\label{Figure6}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+fviz_contrib(res.pca, choice = "var", axes = 1:2)
+```
+
+Figure \ref{Figure6} displays the total contribution of the stocks on PC1 and PC2.
+
+# Dimension description
+
+```{r , include=FALSE}
+res.desc$Dim.1
+dimdesctab <- data.frame(Tickers <- c("SBK", "FSR", "NED", "INL", "ABG", "INP", "SLM", "REM", "BHP", "AGL", "MTN", "SOL", "CFR", "NPN"),
+                        correlation <- c("0.8077564", "0.7887572", "0.7771412", "0.7754290", "0.7642331", "0.7578773", "0.7245234", "0.7105047", "0.5932059", "0.5912447", "0.5766738", "0.5741416", "0.4138740", "0.3695124"),
+                       p.value <- c("0.000000e+00", "0.000000e+00", "0.000000e+00", "0.000000e+00", "0.000000e+00", "0.000000e+00", "0.000000e+00", "0.000000e+00", "0.000000e+00", "0.000000e+00", "9.205497e-306", "1.719383e-302", "3.260387e-143", "2.461847e-112"))
+colnames(dimdesctab)[1] ="Tickers"
+colnames(dimdesctab)[2] ="correlation"
+colnames(dimdesctab)[3] ="p.value"
+```
+
+```{r , results='asis'}
+dimatb <- xtable(dimdesctab, caption = "Dimension description")
+  print.xtable(dimatb,
+             tabular.environment = "longtable",
+             floating = FALSE, # Leave this as is.
+             table.placement = 'H', # Leave this as is.
+             booktabs = T, # Aesthetics
+             include.rownames = FALSE,  # Typically you don't want this in a table.
+             add.to.row = addtorow, # For adding the Continued on next page part...
+             comment = FALSE,
+             caption.placement = 'top',  # Where do you want the caption?
+             size="\\fontsize{12pt}{13pt}\\selectfont"  # Size of text in table..
+             )
+```
+
+# Rolling constituent correlation \label{roll}
+
+```{r Figure7, warning =  FALSE, fig.align = 'center', fig.cap = "Pairwise correlations \\label{Figure7}", fig.height = 3, fig.width = 6, fig.ext = 'png'}
+mean_pw_cors |> 
+    na.omit() |> 
+    ggplot(aes(x = date, y = mean_pw_corr)) +
+    geom_line() +
+    labs(
+      x = "Date",
+      y = "Mean Pairwise Correlation",
+      title = "Rolling Mean Pairwise Correlation",
+      subtitle = "XLF Constituents"
+    )
+```
+
+Figure \ref{Figure7} displays the pairwise correlations of the variables under study. 
+
+# Stratification \label{strat}
+
+```{r , results='asis'}
+strat <- perf_hi |> tibble::as_tibble()
+strattable <- xtable(strat, caption = "Stratification of variables")
+  print.xtable(strattable,
+             tabular.environment = "longtable",
+             floating = FALSE, # Leave this as is.
+             table.placement = 'H', # Leave this as is.
+             booktabs = T, # Aesthetics
+             include.rownames = FALSE,  # Typically you don't want this in a table.
+             add.to.row = addtorow, # For adding the Continued on next page part...
+             comment = FALSE,
+             caption.placement = 'top',  # Where do you want the caption?
+             size="\\fontsize{12pt}{13pt}\\selectfont"  # Size of text in table..
+             )
+```
+
+
+# Conclusion
+
+Returns for the ALSI and SWIX seem to be concentrated in the large caps stocks. 
+
